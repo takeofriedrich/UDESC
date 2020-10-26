@@ -1,0 +1,5062 @@
+Terminais sem uso na gramática
+
+    T_BOOL
+    T_PREC_STR
+
+
+Gramática
+
+    0 $accept: inicial $end
+
+    1 inicial: global main
+    2        | main
+    3        | main funcao
+    4        | global main funcao
+
+    5 global: identificadores
+    6       | global identificadores
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    8 tipo: T_INT_TIPO
+    9     | T_BOOL_TIPO
+   10     | T_REAL_TIPO
+   11     | T_STRING_TIPO
+
+   12 parametros: tipo T_IDENT
+   13           | tipo T_IDENT T_VIRGULA parametros
+   14           | %empty
+
+   15 parametros_chamada: T_IDENT
+   16                   | T_IDENT T_VIRGULA parametros_chamada
+   17                   | T_INT
+   18                   | T_INT T_VIRGULA parametros_chamada
+   19                   | %empty
+
+   20 $@1: %empty
+
+   21 $@2: %empty
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+   23 chamada_funcao: T_IDENT T_PAR_LEFT parametros_chamada T_PAR_RIGHT
+
+   24 escopo: identificadores
+   25       | escopo identificadores
+   26       | chamada_funcao
+   27       | escopo chamada_funcao
+   28       | repeticao_varias_linhas
+   29       | escopo repeticao_varias_linhas
+   30       | repeticao_uma_linha
+   31       | escopo repeticao_uma_linha
+   32       | selecao_varias_linhas
+   33       | escopo selecao_varias_linhas
+   34       | selecao_uma_linha
+   35       | escopo selecao_uma_linha
+   36       | io
+   37       | escopo io
+   38       | operacao
+   39       | escopo operacao
+   40       | retorno
+
+   41 comando_unico: selecao_uma_linha
+   42              | repeticao_uma_linha
+   43              | io
+   44              | operacao
+
+   45 retorno: T_RETURN T_IDENT T_END_LINE
+   46        | T_RETURN T_IDENT T_COL_LEFT T_INT T_CHA_RIGHT T_END_LINE
+   47        | T_RETURN operacao
+
+   48 identificadores: identificador_inteiro
+   49                | identificador_float
+   50                | identificador_bool
+   51                | identificador_string
+
+   52 identificador_inteiro: novo_inteiro T_END_LINE
+   53                      | novo_inteiro T_EQUAL T_INT T_END_LINE
+   54                      | novo_inteiro T_EQUAL operacao_inteira T_END_LINE
+   55                      | novo_inteiro T_EQUAL chamada_funcao T_END_LINE
+   56                      | novo_inteiro T_EQUAL T_MINUS T_INT T_END_LINE
+   57                      | novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   58                      | novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int T_END_LINE
+   59                      | T_IDENT T_EQUAL T_INT T_END_LINE
+   60                      | T_IDENT T_EQUAL chamada_funcao T_END_LINE
+   61                      | T_IDENT T_EQUAL operacao_inteira T_END_LINE
+   62                      | T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   63                      | T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE
+
+   65 novo_inteiro: T_INT_TIPO T_IDENT
+
+   66 valores_vetor_int: T_INT
+   67                  | T_INT valores_vetor_int
+
+   68 identificador_float: T_REAL_TIPO T_IDENT T_END_LINE
+   69                    | T_REAL_TIPO T_IDENT T_EQUAL T_REAL T_END_LINE
+   70                    | T_REAL_TIPO T_IDENT T_EQUAL T_MINUS T_REAL T_END_LINE
+   71                    | T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+   73                    | T_IDENT T_EQUAL T_REAL T_END_LINE
+
+   74 valores_vetor_float: T_REAL
+   75                    | T_REAL valores_vetor_float
+
+   76 identificador_string: T_STRING_TIPO T_IDENT T_END_LINE
+   77                     | T_STRING_TIPO T_IDENT T_EQUAL T_LITERAL T_END_LINE
+   78                     | T_STRING_TIPO T_IDENT T_EQUAL T_STR T_END_LINE
+   79                     | T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   80                     | T_IDENT T_EQUAL operacao_string T_END_LINE
+   81                     | T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+   82                     | T_IDENT T_EQUAL string T_END_LINE
+
+   83 valores_vetor_string: string
+   84                     | T_STR valores_vetor_string
+
+   85 string: T_LITERAL
+
+   86 identificador_bool: T_BOOL_TIPO T_IDENT T_END_LINE
+   87                   | T_BOOL_TIPO T_IDENT T_EQUAL booleano T_END_LINE
+   88                   | T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+   90                   | T_IDENT T_EQUAL T_INT
+
+   91 valores_vetor_bool: booleano valores_vetor_float
+
+   92 booleano: T_INT
+   93         | T_FALSE
+   94         | T_TRUE
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   96                    | T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   97                    | T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+   99                        | T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  100                        | T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+  101 repeticao_label: T_IDENT T_DOIS_PONTOS T_INT
+
+  102 $@3: %empty
+
+  103 while_init: $@3 T_WHILE
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else
+
+  108 else: T_ELSE T_DOIS_PONTOS comando_unico
+
+  109 $@4: %empty
+
+  110 else: T_ELSE T_DOIS_PONTOS $@4 T_CHA_LEFT escopo T_CHA_RIGHT
+
+  111 operacao_logica_label: operacao_logica
+
+  112 io: entrada
+  113   | saida
+
+  114 entrada: T_READ T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  115        | T_READ T_IDENT T_END_LINE
+
+  116 $@5: %empty
+
+  117 $@6: %empty
+
+  118 saida: T_PRINT $@5 argumentos_print $@6 T_END_LINE
+  119      | T_PRINT T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  120      | T_PRINT T_IDENT T_END_LINE
+
+  121 argumentos_print: string
+  122                 | string argumentos_print
+  123                 | T_VIRGULA string
+
+  124 operacao: operacao_inteira T_END_LINE
+  125         | T_INT T_END_LINE
+  126         | operacao_logica T_END_LINE
+  127         | operacao_real T_END_LINE
+  128         | operacao_string T_END_LINE
+  129         | T_LITERAL T_END_LINE
+
+  130 operacao_inteira: T_IDENT T_PLUS T_IDENT
+  131                 | T_INT T_PLUS T_INT
+  132                 | T_INT T_PLUS T_IDENT
+  133                 | T_IDENT T_PLUS T_INT
+  134                 | operacao_inteira T_MINUS operacao_inteira
+  135                 | operacao_inteira T_MINUS T_IDENT
+  136                 | T_IDENT T_MINUS operacao_inteira
+  137                 | T_IDENT T_MINUS T_IDENT
+  138                 | operacao_inteira T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira T_MULTIPLY T_IDENT
+  140                 | T_IDENT T_MULTIPLY operacao_inteira
+  141                 | T_IDENT T_MULTIPLY T_IDENT
+  142                 | T_PAR_LEFT operacao_inteira T_PAR_RIGHT
+
+  143 operacao_real: T_REAL
+  144              | operacao_real T_PLUS operacao_real
+  145              | operacao_real T_MINUS operacao_real
+  146              | operacao_real T_MULTIPLY operacao_real
+  147              | operacao_real T_DIVIDE operacao_real
+  148              | operacao_inteira T_PLUS operacao_real
+  149              | operacao_inteira T_LESS operacao_real
+  150              | operacao_inteira T_MULTIPLY operacao_real
+  151              | operacao_inteira T_DIVIDE operacao_real
+  152              | operacao_real T_PLUS operacao_inteira
+  153              | operacao_real T_MINUS operacao_inteira
+  154              | operacao_real T_MULTIPLY operacao_inteira
+  155              | operacao_real T_DIVIDE operacao_inteira
+  156              | T_PAR_LEFT operacao_real T_PAR_RIGHT
+  157              | operacao_inteira T_DIVIDE operacao_inteira
+
+  158 operacao_logica: T_TRUE
+  159                | T_FALSE
+  160                | operacao_logica T_OR operacao_logica
+  161                | T_IDENT T_OR operacao_logica
+  162                | operacao_logica T_AND operacao_logica
+  163                | operacao_logica T_MORE operacao_logica
+  164                | T_IDENT T_MORE operacao_logica
+  165                | T_IDENT T_MORE T_INT
+  166                | operacao_logica T_LESS operacao_logica
+  167                | T_IDENT T_LESS operacao_logica
+  168                | T_IDENT T_LESS T_INT
+  169                | operacao_logica T_EQQ operacao_logica
+  170                | T_IDENT T_EQQ operacao_logica
+  171                | T_IDENT T_EQQ T_INT
+
+  172 operacao_string: T_IDENT T_APPEND T_LITERAL
+  173                | T_LITERAL T_APPEND T_IDENT
+  174                | T_LITERAL T_APPEND T_LITERAL
+
+
+Terminais, com as regras onde eles aparecem
+
+    $end (0) 0
+    error (256)
+    T_INT <ival> (258) 17 18 46 53 56 57 58 59 62 63 66 67 71 72 79 81 88 89 90 92 96 97 99 100 101 114 119 125 131 132 133 165 168 171
+    T_REAL <fval> (259) 69 70 73 74 75 143
+    T_BOOL <ival> (260)
+    T_IDENT <str> (261) 12 13 15 16 22 23 45 46 59 60 61 62 63 64 65 68 69 70 71 72 73 76 77 78 79 80 81 82 86 87 88 89 90 101 114 115 119 120 130 132 133 135 136 137 139 140 141 161 164 165 167 168 170 171 172 173
+    T_LITERAL <str> (262) 77 85 129 172 173 174
+    T_STR <str> (263) 78 84
+    T_TRUE <ival> (264) 94 158
+    T_FALSE <ival> (265) 93 159
+    T_END_LINE (266) 45 46 52 53 54 55 56 57 58 59 60 61 62 63 64 68 69 70 71 72 73 76 77 78 79 80 81 82 86 87 88 89 114 115 118 119 120 124 125 126 127 128 129
+    T_DOIS_PONTOS (267) 58 72 81 89 95 96 97 98 99 100 101 104 105 106 107 108 110
+    T_VIRGULA (268) 13 16 18 96 97 99 100 123
+    T_STRING_TIPO (269) 11 76 77 78 79 81
+    T_BOOL_TIPO (270) 9 86 87 88 89
+    T_INT_TIPO (271) 8 65
+    T_REAL_TIPO (272) 10 68 69 70 71 72
+    T_MAIN (273) 7
+    T_RETURN (274) 45 46 47
+    T_IF (275) 104 105 106 107
+    T_WHILE (276) 103
+    T_FOR (277) 96 97 99 100
+    T_PRINT (278) 118 119 120
+    T_READ (279) 114 115
+    T_PLUS (280) 130 131 132 133 144 148 152
+    T_MINUS (281) 56 70 134 135 136 137 145 153
+    T_MULTIPLY (282) 138 139 140 141 146 150 154
+    T_DIVIDE (283) 147 151 155 157
+    T_APPEND (284) 172 173 174
+    T_PAR_LEFT (285) 7 22 23 95 96 97 98 99 100 104 105 106 107 142 156
+    T_CHA_LEFT (286) 7 22 98 99 100 106 107 110
+    T_PAR_RIGHT (287) 7 22 23 95 96 97 98 99 100 104 105 106 107 142 156
+    T_COL_RIGHT (288) 57 58 62 63 64 71 72 79 81 88 89 114 119
+    T_CHA_RIGHT (289) 7 22 46 98 99 100 106 107 110
+    T_EQQ (290) 169 170 171
+    T_LESS (291) 149 166 167 168
+    T_MORE (292) 163 164 165
+    T_EQUAL (293) 53 54 55 56 59 60 61 62 63 64 69 70 73 77 78 80 82 87 90
+    T_OR (294) 160 161
+    T_AND (295) 162
+    T_COL_LEFT (296) 46 57 58 62 63 64 71 72 79 81 88 89 114 119
+    T_THEN1 (297)
+    T_THEN2 (298)
+    T_ELSE (299) 108 110
+    T_PREC_STR (300)
+    T_RET (301)
+
+
+Não terminais com as regras onde eles aparecem
+
+    $accept (47)
+        à esquerda: 0
+    inicial (48)
+        à esquerda: 1 2 3 4
+        à direita: 0
+    global (49)
+        à esquerda: 5 6
+        à direita: 1 4 6
+    main (50)
+        à esquerda: 7
+        à direita: 1 2 3 4
+    tipo <ival> (51)
+        à esquerda: 8 9 10 11
+        à direita: 7 12 13 22 96 99
+    parametros (52)
+        à esquerda: 12 13 14
+        à direita: 7 13 22
+    parametros_chamada (53)
+        à esquerda: 15 16 17 18 19
+        à direita: 16 18 23
+    funcao (54)
+        à esquerda: 22
+        à direita: 3 4
+    $@1 (55)
+        à esquerda: 20
+        à direita: 22
+    $@2 (56)
+        à esquerda: 21
+        à direita: 22
+    chamada_funcao <str> (57)
+        à esquerda: 23
+        à direita: 26 27 55 60 64
+    escopo (58)
+        à esquerda: 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
+        à direita: 7 22 25 27 29 31 33 35 37 39 98 99 100 106 107 110
+    comando_unico (59)
+        à esquerda: 41 42 43 44
+        à direita: 95 96 97 104 105 108
+    retorno (60)
+        à esquerda: 45 46 47
+        à direita: 7 40
+    identificadores (61)
+        à esquerda: 48 49 50 51
+        à direita: 5 6 24 25
+    identificador_inteiro (62)
+        à esquerda: 52 53 54 55 56 57 58 59 60 61 62 63 64
+        à direita: 48
+    novo_inteiro <str> (63)
+        à esquerda: 65
+        à direita: 52 53 54 55 56 57 58
+    valores_vetor_int (64)
+        à esquerda: 66 67
+        à direita: 58 67
+    identificador_float (65)
+        à esquerda: 68 69 70 71 72 73
+        à direita: 49
+    valores_vetor_float (66)
+        à esquerda: 74 75
+        à direita: 72 75 91
+    identificador_string (67)
+        à esquerda: 76 77 78 79 80 81 82
+        à direita: 51
+    valores_vetor_string (68)
+        à esquerda: 83 84
+        à direita: 81 84
+    string <str> (69)
+        à esquerda: 85
+        à direita: 82 83 121 122 123
+    identificador_bool (70)
+        à esquerda: 86 87 88 89 90
+        à direita: 50
+    valores_vetor_bool (71)
+        à esquerda: 91
+        à direita: 89
+    booleano (72)
+        à esquerda: 92 93 94
+        à direita: 87 91
+    repeticao_uma_linha (73)
+        à esquerda: 95 96 97
+        à direita: 30 31 42
+    repeticao_varias_linhas (74)
+        à esquerda: 98 99 100
+        à direita: 28 29
+    repeticao_label <ival> (75)
+        à esquerda: 101
+        à direita: 96 97 99 100
+    while_init (76)
+        à esquerda: 103
+        à direita: 95 98
+    $@3 (77)
+        à esquerda: 102
+        à direita: 103
+    selecao_uma_linha (78)
+        à esquerda: 104 105
+        à direita: 34 35 41
+    selecao_varias_linhas (79)
+        à esquerda: 106 107
+        à direita: 32 33
+    else (80)
+        à esquerda: 108 110
+        à direita: 105 107
+    $@4 (81)
+        à esquerda: 109
+        à direita: 110
+    operacao_logica_label (82)
+        à esquerda: 111
+        à direita: 95 98 104 105 106 107
+    io (83)
+        à esquerda: 112 113
+        à direita: 36 37 43
+    entrada (84)
+        à esquerda: 114 115
+        à direita: 112
+    saida (85)
+        à esquerda: 118 119 120
+        à direita: 113
+    $@5 (86)
+        à esquerda: 116
+        à direita: 118
+    $@6 (87)
+        à esquerda: 117
+        à direita: 118
+    argumentos_print (88)
+        à esquerda: 121 122 123
+        à direita: 118 122
+    operacao (89)
+        à esquerda: 124 125 126 127 128 129
+        à direita: 38 39 44 47
+    operacao_inteira (90)
+        à esquerda: 130 131 132 133 134 135 136 137 138 139 140 141 142
+        à direita: 54 61 124 134 135 136 138 139 140 142 148 149 150 151 152 153 154 155 157
+    operacao_real (91)
+        à esquerda: 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157
+        à direita: 127 144 145 146 147 148 149 150 151 152 153 154 155 156
+    operacao_logica (92)
+        à esquerda: 158 159 160 161 162 163 164 165 166 167 168 169 170 171
+        à direita: 111 126 160 161 162 163 164 166 167 169 170
+    operacao_string (93)
+        à esquerda: 172 173 174
+        à direita: 80 128
+
+
+Estado 0
+
+    0 $accept: . inicial $end
+
+    T_IDENT        deslocar, e ir ao estado 1
+    T_STRING_TIPO  deslocar, e ir ao estado 2
+    T_BOOL_TIPO    deslocar, e ir ao estado 3
+    T_INT_TIPO     deslocar, e ir ao estado 4
+    T_REAL_TIPO    deslocar, e ir ao estado 5
+
+    inicial                ir ao estado 6
+    global                 ir ao estado 7
+    main                   ir ao estado 8
+    tipo                   ir ao estado 9
+    identificadores        ir ao estado 10
+    identificador_inteiro  ir ao estado 11
+    novo_inteiro           ir ao estado 12
+    identificador_float    ir ao estado 13
+    identificador_string   ir ao estado 14
+    identificador_bool     ir ao estado 15
+
+
+Estado 1
+
+   59 identificador_inteiro: T_IDENT . T_EQUAL T_INT T_END_LINE
+   60                      | T_IDENT . T_EQUAL chamada_funcao T_END_LINE
+   61                      | T_IDENT . T_EQUAL operacao_inteira T_END_LINE
+   62                      | T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   63                      | T_IDENT . T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT . T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE
+   73 identificador_float: T_IDENT . T_EQUAL T_REAL T_END_LINE
+   80 identificador_string: T_IDENT . T_EQUAL operacao_string T_END_LINE
+   82                     | T_IDENT . T_EQUAL string T_END_LINE
+   90 identificador_bool: T_IDENT . T_EQUAL T_INT
+
+    T_EQUAL     deslocar, e ir ao estado 16
+    T_COL_LEFT  deslocar, e ir ao estado 17
+
+
+Estado 2
+
+   11 tipo: T_STRING_TIPO .
+   76 identificador_string: T_STRING_TIPO . T_IDENT T_END_LINE
+   77                     | T_STRING_TIPO . T_IDENT T_EQUAL T_LITERAL T_END_LINE
+   78                     | T_STRING_TIPO . T_IDENT T_EQUAL T_STR T_END_LINE
+   79                     | T_STRING_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   81                     | T_STRING_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 18
+
+    $padrão  reduzir usando a regra 11 (tipo)
+
+
+Estado 3
+
+    9 tipo: T_BOOL_TIPO .
+   86 identificador_bool: T_BOOL_TIPO . T_IDENT T_END_LINE
+   87                   | T_BOOL_TIPO . T_IDENT T_EQUAL booleano T_END_LINE
+   88                   | T_BOOL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 19
+
+    $padrão  reduzir usando a regra 9 (tipo)
+
+
+Estado 4
+
+    8 tipo: T_INT_TIPO .
+   65 novo_inteiro: T_INT_TIPO . T_IDENT
+
+    T_IDENT  deslocar, e ir ao estado 20
+
+    $padrão  reduzir usando a regra 8 (tipo)
+
+
+Estado 5
+
+   10 tipo: T_REAL_TIPO .
+   68 identificador_float: T_REAL_TIPO . T_IDENT T_END_LINE
+   69                    | T_REAL_TIPO . T_IDENT T_EQUAL T_REAL T_END_LINE
+   70                    | T_REAL_TIPO . T_IDENT T_EQUAL T_MINUS T_REAL T_END_LINE
+   71                    | T_REAL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 21
+
+    $padrão  reduzir usando a regra 10 (tipo)
+
+
+Estado 6
+
+    0 $accept: inicial . $end
+
+    $end  deslocar, e ir ao estado 22
+
+
+Estado 7
+
+    1 inicial: global . main
+    4        | global . main funcao
+    6 global: global . identificadores
+
+    T_IDENT        deslocar, e ir ao estado 1
+    T_STRING_TIPO  deslocar, e ir ao estado 2
+    T_BOOL_TIPO    deslocar, e ir ao estado 3
+    T_INT_TIPO     deslocar, e ir ao estado 4
+    T_REAL_TIPO    deslocar, e ir ao estado 5
+
+    main                   ir ao estado 23
+    tipo                   ir ao estado 9
+    identificadores        ir ao estado 24
+    identificador_inteiro  ir ao estado 11
+    novo_inteiro           ir ao estado 12
+    identificador_float    ir ao estado 13
+    identificador_string   ir ao estado 14
+    identificador_bool     ir ao estado 15
+
+
+Estado 8
+
+    2 inicial: main .
+    3        | main . funcao
+
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    $padrão  reduzir usando a regra 2 (inicial)
+
+    tipo    ir ao estado 29
+    funcao  ir ao estado 30
+
+
+Estado 9
+
+    7 main: tipo . T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    T_MAIN  deslocar, e ir ao estado 31
+
+
+Estado 10
+
+    5 global: identificadores .
+
+    $padrão  reduzir usando a regra 5 (global)
+
+
+Estado 11
+
+   48 identificadores: identificador_inteiro .
+
+    $padrão  reduzir usando a regra 48 (identificadores)
+
+
+Estado 12
+
+   52 identificador_inteiro: novo_inteiro . T_END_LINE
+   53                      | novo_inteiro . T_EQUAL T_INT T_END_LINE
+   54                      | novo_inteiro . T_EQUAL operacao_inteira T_END_LINE
+   55                      | novo_inteiro . T_EQUAL chamada_funcao T_END_LINE
+   56                      | novo_inteiro . T_EQUAL T_MINUS T_INT T_END_LINE
+   57                      | novo_inteiro . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   58                      | novo_inteiro . T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 32
+    T_EQUAL     deslocar, e ir ao estado 33
+    T_COL_LEFT  deslocar, e ir ao estado 34
+
+
+Estado 13
+
+   49 identificadores: identificador_float .
+
+    $padrão  reduzir usando a regra 49 (identificadores)
+
+
+Estado 14
+
+   51 identificadores: identificador_string .
+
+    $padrão  reduzir usando a regra 51 (identificadores)
+
+
+Estado 15
+
+   50 identificadores: identificador_bool .
+
+    $padrão  reduzir usando a regra 50 (identificadores)
+
+
+Estado 16
+
+   59 identificador_inteiro: T_IDENT T_EQUAL . T_INT T_END_LINE
+   60                      | T_IDENT T_EQUAL . chamada_funcao T_END_LINE
+   61                      | T_IDENT T_EQUAL . operacao_inteira T_END_LINE
+   73 identificador_float: T_IDENT T_EQUAL . T_REAL T_END_LINE
+   80 identificador_string: T_IDENT T_EQUAL . operacao_string T_END_LINE
+   82                     | T_IDENT T_EQUAL . string T_END_LINE
+   90 identificador_bool: T_IDENT T_EQUAL . T_INT
+
+    T_INT       deslocar, e ir ao estado 35
+    T_REAL      deslocar, e ir ao estado 36
+    T_IDENT     deslocar, e ir ao estado 37
+    T_LITERAL   deslocar, e ir ao estado 38
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    chamada_funcao    ir ao estado 40
+    string            ir ao estado 41
+    operacao_inteira  ir ao estado 42
+    operacao_string   ir ao estado 43
+
+
+Estado 17
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   63                      | T_IDENT T_COL_LEFT . T_IDENT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT T_COL_LEFT . T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE
+
+    T_INT    deslocar, e ir ao estado 44
+    T_IDENT  deslocar, e ir ao estado 45
+
+
+Estado 18
+
+   76 identificador_string: T_STRING_TIPO T_IDENT . T_END_LINE
+   77                     | T_STRING_TIPO T_IDENT . T_EQUAL T_LITERAL T_END_LINE
+   78                     | T_STRING_TIPO T_IDENT . T_EQUAL T_STR T_END_LINE
+   79                     | T_STRING_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   81                     | T_STRING_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 46
+    T_EQUAL     deslocar, e ir ao estado 47
+    T_COL_LEFT  deslocar, e ir ao estado 48
+
+
+Estado 19
+
+   86 identificador_bool: T_BOOL_TIPO T_IDENT . T_END_LINE
+   87                   | T_BOOL_TIPO T_IDENT . T_EQUAL booleano T_END_LINE
+   88                   | T_BOOL_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 49
+    T_EQUAL     deslocar, e ir ao estado 50
+    T_COL_LEFT  deslocar, e ir ao estado 51
+
+
+Estado 20
+
+   65 novo_inteiro: T_INT_TIPO T_IDENT .
+
+    $padrão  reduzir usando a regra 65 (novo_inteiro)
+
+
+Estado 21
+
+   68 identificador_float: T_REAL_TIPO T_IDENT . T_END_LINE
+   69                    | T_REAL_TIPO T_IDENT . T_EQUAL T_REAL T_END_LINE
+   70                    | T_REAL_TIPO T_IDENT . T_EQUAL T_MINUS T_REAL T_END_LINE
+   71                    | T_REAL_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 52
+    T_EQUAL     deslocar, e ir ao estado 53
+    T_COL_LEFT  deslocar, e ir ao estado 54
+
+
+Estado 22
+
+    0 $accept: inicial $end .
+
+    $padrão  aceitar
+
+
+Estado 23
+
+    1 inicial: global main .
+    4        | global main . funcao
+
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    $padrão  reduzir usando a regra 1 (inicial)
+
+    tipo    ir ao estado 29
+    funcao  ir ao estado 55
+
+
+Estado 24
+
+    6 global: global identificadores .
+
+    $padrão  reduzir usando a regra 6 (global)
+
+
+Estado 25
+
+   11 tipo: T_STRING_TIPO .
+
+    $padrão  reduzir usando a regra 11 (tipo)
+
+
+Estado 26
+
+    9 tipo: T_BOOL_TIPO .
+
+    $padrão  reduzir usando a regra 9 (tipo)
+
+
+Estado 27
+
+    8 tipo: T_INT_TIPO .
+
+    $padrão  reduzir usando a regra 8 (tipo)
+
+
+Estado 28
+
+   10 tipo: T_REAL_TIPO .
+
+    $padrão  reduzir usando a regra 10 (tipo)
+
+
+Estado 29
+
+   22 funcao: tipo . T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+    T_IDENT  deslocar, e ir ao estado 56
+
+
+Estado 30
+
+    3 inicial: main funcao .
+
+    $padrão  reduzir usando a regra 3 (inicial)
+
+
+Estado 31
+
+    7 main: tipo T_MAIN . T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    T_PAR_LEFT  deslocar, e ir ao estado 57
+
+
+Estado 32
+
+   52 identificador_inteiro: novo_inteiro T_END_LINE .
+
+    $padrão  reduzir usando a regra 52 (identificador_inteiro)
+
+
+Estado 33
+
+   53 identificador_inteiro: novo_inteiro T_EQUAL . T_INT T_END_LINE
+   54                      | novo_inteiro T_EQUAL . operacao_inteira T_END_LINE
+   55                      | novo_inteiro T_EQUAL . chamada_funcao T_END_LINE
+   56                      | novo_inteiro T_EQUAL . T_MINUS T_INT T_END_LINE
+
+    T_INT       deslocar, e ir ao estado 58
+    T_IDENT     deslocar, e ir ao estado 59
+    T_MINUS     deslocar, e ir ao estado 60
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    chamada_funcao    ir ao estado 61
+    operacao_inteira  ir ao estado 62
+
+
+Estado 34
+
+   57 identificador_inteiro: novo_inteiro T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+   58                      | novo_inteiro T_COL_LEFT . T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 63
+
+
+Estado 35
+
+   59 identificador_inteiro: T_IDENT T_EQUAL T_INT . T_END_LINE
+   90 identificador_bool: T_IDENT T_EQUAL T_INT .
+  131 operacao_inteira: T_INT . T_PLUS T_INT
+  132                 | T_INT . T_PLUS T_IDENT
+
+    T_END_LINE  deslocar, e ir ao estado 64
+    T_PLUS      deslocar, e ir ao estado 65
+
+    $padrão  reduzir usando a regra 90 (identificador_bool)
+
+
+Estado 36
+
+   73 identificador_float: T_IDENT T_EQUAL T_REAL . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 66
+
+
+Estado 37
+
+   23 chamada_funcao: T_IDENT . T_PAR_LEFT parametros_chamada T_PAR_RIGHT
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+  172 operacao_string: T_IDENT . T_APPEND T_LITERAL
+
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+    T_APPEND    deslocar, e ir ao estado 70
+    T_PAR_LEFT  deslocar, e ir ao estado 71
+
+
+Estado 38
+
+   85 string: T_LITERAL .
+  173 operacao_string: T_LITERAL . T_APPEND T_IDENT
+  174                | T_LITERAL . T_APPEND T_LITERAL
+
+    T_APPEND  deslocar, e ir ao estado 72
+
+    $padrão  reduzir usando a regra 85 (string)
+
+
+Estado 39
+
+  142 operacao_inteira: T_PAR_LEFT . operacao_inteira T_PAR_RIGHT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    operacao_inteira  ir ao estado 75
+
+
+Estado 40
+
+   60 identificador_inteiro: T_IDENT T_EQUAL chamada_funcao . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 76
+
+
+Estado 41
+
+   82 identificador_string: T_IDENT T_EQUAL string . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 77
+
+
+Estado 42
+
+   61 identificador_inteiro: T_IDENT T_EQUAL operacao_inteira . T_END_LINE
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+
+    T_END_LINE  deslocar, e ir ao estado 78
+    T_MINUS     deslocar, e ir ao estado 79
+    T_MULTIPLY  deslocar, e ir ao estado 80
+
+
+Estado 43
+
+   80 identificador_string: T_IDENT T_EQUAL operacao_string . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 81
+
+
+Estado 44
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 82
+
+
+Estado 45
+
+   63 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT . T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT T_COL_LEFT T_IDENT . T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 83
+
+
+Estado 46
+
+   76 identificador_string: T_STRING_TIPO T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 76 (identificador_string)
+
+
+Estado 47
+
+   77 identificador_string: T_STRING_TIPO T_IDENT T_EQUAL . T_LITERAL T_END_LINE
+   78                     | T_STRING_TIPO T_IDENT T_EQUAL . T_STR T_END_LINE
+
+    T_LITERAL  deslocar, e ir ao estado 84
+    T_STR      deslocar, e ir ao estado 85
+
+
+Estado 48
+
+   79 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+   81                     | T_STRING_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 86
+
+
+Estado 49
+
+   86 identificador_bool: T_BOOL_TIPO T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 86 (identificador_bool)
+
+
+Estado 50
+
+   87 identificador_bool: T_BOOL_TIPO T_IDENT T_EQUAL . booleano T_END_LINE
+
+    T_INT    deslocar, e ir ao estado 87
+    T_TRUE   deslocar, e ir ao estado 88
+    T_FALSE  deslocar, e ir ao estado 89
+
+    booleano  ir ao estado 90
+
+
+Estado 51
+
+   88 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 91
+
+
+Estado 52
+
+   68 identificador_float: T_REAL_TIPO T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 68 (identificador_float)
+
+
+Estado 53
+
+   69 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL . T_REAL T_END_LINE
+   70                    | T_REAL_TIPO T_IDENT T_EQUAL . T_MINUS T_REAL T_END_LINE
+
+    T_REAL   deslocar, e ir ao estado 92
+    T_MINUS  deslocar, e ir ao estado 93
+
+
+Estado 54
+
+   71 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 94
+
+
+Estado 55
+
+    4 inicial: global main funcao .
+
+    $padrão  reduzir usando a regra 4 (inicial)
+
+
+Estado 56
+
+   22 funcao: tipo T_IDENT . T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+    T_PAR_LEFT  deslocar, e ir ao estado 95
+
+
+Estado 57
+
+    7 main: tipo T_MAIN T_PAR_LEFT . parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    $padrão  reduzir usando a regra 14 (parametros)
+
+    tipo        ir ao estado 96
+    parametros  ir ao estado 97
+
+
+Estado 58
+
+   53 identificador_inteiro: novo_inteiro T_EQUAL T_INT . T_END_LINE
+  131 operacao_inteira: T_INT . T_PLUS T_INT
+  132                 | T_INT . T_PLUS T_IDENT
+
+    T_END_LINE  deslocar, e ir ao estado 98
+    T_PLUS      deslocar, e ir ao estado 65
+
+
+Estado 59
+
+   23 chamada_funcao: T_IDENT . T_PAR_LEFT parametros_chamada T_PAR_RIGHT
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+    T_PAR_LEFT  deslocar, e ir ao estado 71
+
+
+Estado 60
+
+   56 identificador_inteiro: novo_inteiro T_EQUAL T_MINUS . T_INT T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 99
+
+
+Estado 61
+
+   55 identificador_inteiro: novo_inteiro T_EQUAL chamada_funcao . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 100
+
+
+Estado 62
+
+   54 identificador_inteiro: novo_inteiro T_EQUAL operacao_inteira . T_END_LINE
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+
+    T_END_LINE  deslocar, e ir ao estado 101
+    T_MINUS     deslocar, e ir ao estado 79
+    T_MULTIPLY  deslocar, e ir ao estado 80
+
+
+Estado 63
+
+   57 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+   58                      | novo_inteiro T_COL_LEFT T_INT . T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 102
+
+
+Estado 64
+
+   59 identificador_inteiro: T_IDENT T_EQUAL T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 59 (identificador_inteiro)
+
+
+Estado 65
+
+  131 operacao_inteira: T_INT T_PLUS . T_INT
+  132                 | T_INT T_PLUS . T_IDENT
+
+    T_INT    deslocar, e ir ao estado 103
+    T_IDENT  deslocar, e ir ao estado 104
+
+
+Estado 66
+
+   73 identificador_float: T_IDENT T_EQUAL T_REAL T_END_LINE .
+
+    $padrão  reduzir usando a regra 73 (identificador_float)
+
+
+Estado 67
+
+  130 operacao_inteira: T_IDENT T_PLUS . T_IDENT
+  133                 | T_IDENT T_PLUS . T_INT
+
+    T_INT    deslocar, e ir ao estado 105
+    T_IDENT  deslocar, e ir ao estado 106
+
+
+Estado 68
+
+  136 operacao_inteira: T_IDENT T_MINUS . operacao_inteira
+  137                 | T_IDENT T_MINUS . T_IDENT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_IDENT     deslocar, e ir ao estado 107
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    operacao_inteira  ir ao estado 108
+
+
+Estado 69
+
+  140 operacao_inteira: T_IDENT T_MULTIPLY . operacao_inteira
+  141                 | T_IDENT T_MULTIPLY . T_IDENT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_IDENT     deslocar, e ir ao estado 109
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    operacao_inteira  ir ao estado 110
+
+
+Estado 70
+
+  172 operacao_string: T_IDENT T_APPEND . T_LITERAL
+
+    T_LITERAL  deslocar, e ir ao estado 111
+
+
+Estado 71
+
+   23 chamada_funcao: T_IDENT T_PAR_LEFT . parametros_chamada T_PAR_RIGHT
+
+    T_INT    deslocar, e ir ao estado 112
+    T_IDENT  deslocar, e ir ao estado 113
+
+    $padrão  reduzir usando a regra 19 (parametros_chamada)
+
+    parametros_chamada  ir ao estado 114
+
+
+Estado 72
+
+  173 operacao_string: T_LITERAL T_APPEND . T_IDENT
+  174                | T_LITERAL T_APPEND . T_LITERAL
+
+    T_IDENT    deslocar, e ir ao estado 115
+    T_LITERAL  deslocar, e ir ao estado 116
+
+
+Estado 73
+
+  131 operacao_inteira: T_INT . T_PLUS T_INT
+  132                 | T_INT . T_PLUS T_IDENT
+
+    T_PLUS  deslocar, e ir ao estado 65
+
+
+Estado 74
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+
+
+Estado 75
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  142                 | T_PAR_LEFT operacao_inteira . T_PAR_RIGHT
+
+    T_MINUS      deslocar, e ir ao estado 79
+    T_MULTIPLY   deslocar, e ir ao estado 80
+    T_PAR_RIGHT  deslocar, e ir ao estado 117
+
+
+Estado 76
+
+   60 identificador_inteiro: T_IDENT T_EQUAL chamada_funcao T_END_LINE .
+
+    $padrão  reduzir usando a regra 60 (identificador_inteiro)
+
+
+Estado 77
+
+   82 identificador_string: T_IDENT T_EQUAL string T_END_LINE .
+
+    $padrão  reduzir usando a regra 82 (identificador_string)
+
+
+Estado 78
+
+   61 identificador_inteiro: T_IDENT T_EQUAL operacao_inteira T_END_LINE .
+
+    $padrão  reduzir usando a regra 61 (identificador_inteiro)
+
+
+Estado 79
+
+  134 operacao_inteira: operacao_inteira T_MINUS . operacao_inteira
+  135                 | operacao_inteira T_MINUS . T_IDENT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_IDENT     deslocar, e ir ao estado 118
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    operacao_inteira  ir ao estado 119
+
+
+Estado 80
+
+  138 operacao_inteira: operacao_inteira T_MULTIPLY . operacao_inteira
+  139                 | operacao_inteira T_MULTIPLY . T_IDENT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_IDENT     deslocar, e ir ao estado 120
+    T_PAR_LEFT  deslocar, e ir ao estado 39
+
+    operacao_inteira  ir ao estado 121
+
+
+Estado 81
+
+   80 identificador_string: T_IDENT T_EQUAL operacao_string T_END_LINE .
+
+    $padrão  reduzir usando a regra 80 (identificador_string)
+
+
+Estado 82
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_EQUAL T_INT T_END_LINE
+
+    T_EQUAL  deslocar, e ir ao estado 122
+
+
+Estado 83
+
+   63 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT . T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT . T_EQUAL chamada_funcao T_END_LINE
+
+    T_EQUAL  deslocar, e ir ao estado 123
+
+
+Estado 84
+
+   77 identificador_string: T_STRING_TIPO T_IDENT T_EQUAL T_LITERAL . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 124
+
+
+Estado 85
+
+   78 identificador_string: T_STRING_TIPO T_IDENT T_EQUAL T_STR . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 125
+
+
+Estado 86
+
+   79 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+   81                     | T_STRING_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 126
+
+
+Estado 87
+
+   92 booleano: T_INT .
+
+    $padrão  reduzir usando a regra 92 (booleano)
+
+
+Estado 88
+
+   94 booleano: T_TRUE .
+
+    $padrão  reduzir usando a regra 94 (booleano)
+
+
+Estado 89
+
+   93 booleano: T_FALSE .
+
+    $padrão  reduzir usando a regra 93 (booleano)
+
+
+Estado 90
+
+   87 identificador_bool: T_BOOL_TIPO T_IDENT T_EQUAL booleano . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 127
+
+
+Estado 91
+
+   88 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 128
+
+
+Estado 92
+
+   69 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL T_REAL . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 129
+
+
+Estado 93
+
+   70 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL T_MINUS . T_REAL T_END_LINE
+
+    T_REAL  deslocar, e ir ao estado 130
+
+
+Estado 94
+
+   71 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 131
+
+
+Estado 95
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT . parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    $padrão  reduzir usando a regra 14 (parametros)
+
+    tipo        ir ao estado 96
+    parametros  ir ao estado 132
+
+
+Estado 96
+
+   12 parametros: tipo . T_IDENT
+   13           | tipo . T_IDENT T_VIRGULA parametros
+
+    T_IDENT  deslocar, e ir ao estado 133
+
+
+Estado 97
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros . T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 134
+
+
+Estado 98
+
+   53 identificador_inteiro: novo_inteiro T_EQUAL T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 53 (identificador_inteiro)
+
+
+Estado 99
+
+   56 identificador_inteiro: novo_inteiro T_EQUAL T_MINUS T_INT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 135
+
+
+Estado 100
+
+   55 identificador_inteiro: novo_inteiro T_EQUAL chamada_funcao T_END_LINE .
+
+    $padrão  reduzir usando a regra 55 (identificador_inteiro)
+
+
+Estado 101
+
+   54 identificador_inteiro: novo_inteiro T_EQUAL operacao_inteira T_END_LINE .
+
+    $padrão  reduzir usando a regra 54 (identificador_inteiro)
+
+
+Estado 102
+
+   57 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+   58                      | novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT . T_DOIS_PONTOS valores_vetor_int T_END_LINE
+
+    T_END_LINE     deslocar, e ir ao estado 136
+    T_DOIS_PONTOS  deslocar, e ir ao estado 137
+
+
+Estado 103
+
+  131 operacao_inteira: T_INT T_PLUS T_INT .
+
+    $padrão  reduzir usando a regra 131 (operacao_inteira)
+
+
+Estado 104
+
+  132 operacao_inteira: T_INT T_PLUS T_IDENT .
+
+    $padrão  reduzir usando a regra 132 (operacao_inteira)
+
+
+Estado 105
+
+  133 operacao_inteira: T_IDENT T_PLUS T_INT .
+
+    $padrão  reduzir usando a regra 133 (operacao_inteira)
+
+
+Estado 106
+
+  130 operacao_inteira: T_IDENT T_PLUS T_IDENT .
+
+    $padrão  reduzir usando a regra 130 (operacao_inteira)
+
+
+Estado 107
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  137                 | T_IDENT T_MINUS T_IDENT .
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+
+    $padrão  reduzir usando a regra 137 (operacao_inteira)
+
+
+Estado 108
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  136                 | T_IDENT T_MINUS operacao_inteira .
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+
+    T_MULTIPLY  deslocar, e ir ao estado 80
+
+    $padrão  reduzir usando a regra 136 (operacao_inteira)
+
+
+Estado 109
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+  141                 | T_IDENT T_MULTIPLY T_IDENT .
+
+    $padrão  reduzir usando a regra 141 (operacao_inteira)
+
+
+Estado 110
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  140                 | T_IDENT T_MULTIPLY operacao_inteira .
+
+    $padrão  reduzir usando a regra 140 (operacao_inteira)
+
+
+Estado 111
+
+  172 operacao_string: T_IDENT T_APPEND T_LITERAL .
+
+    $padrão  reduzir usando a regra 172 (operacao_string)
+
+
+Estado 112
+
+   17 parametros_chamada: T_INT .
+   18                   | T_INT . T_VIRGULA parametros_chamada
+
+    T_VIRGULA  deslocar, e ir ao estado 138
+
+    $padrão  reduzir usando a regra 17 (parametros_chamada)
+
+
+Estado 113
+
+   15 parametros_chamada: T_IDENT .
+   16                   | T_IDENT . T_VIRGULA parametros_chamada
+
+    T_VIRGULA  deslocar, e ir ao estado 139
+
+    $padrão  reduzir usando a regra 15 (parametros_chamada)
+
+
+Estado 114
+
+   23 chamada_funcao: T_IDENT T_PAR_LEFT parametros_chamada . T_PAR_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 140
+
+
+Estado 115
+
+  173 operacao_string: T_LITERAL T_APPEND T_IDENT .
+
+    $padrão  reduzir usando a regra 173 (operacao_string)
+
+
+Estado 116
+
+  174 operacao_string: T_LITERAL T_APPEND T_LITERAL .
+
+    $padrão  reduzir usando a regra 174 (operacao_string)
+
+
+Estado 117
+
+  142 operacao_inteira: T_PAR_LEFT operacao_inteira T_PAR_RIGHT .
+
+    $padrão  reduzir usando a regra 142 (operacao_inteira)
+
+
+Estado 118
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  135                 | operacao_inteira T_MINUS T_IDENT .
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+
+    $padrão  reduzir usando a regra 135 (operacao_inteira)
+
+
+Estado 119
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  134                 | operacao_inteira T_MINUS operacao_inteira .
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+
+    T_MULTIPLY  deslocar, e ir ao estado 80
+
+    $padrão  reduzir usando a regra 134 (operacao_inteira)
+
+
+Estado 120
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  139                 | operacao_inteira T_MULTIPLY T_IDENT .
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+
+    $padrão  reduzir usando a regra 139 (operacao_inteira)
+
+
+Estado 121
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  138                 | operacao_inteira T_MULTIPLY operacao_inteira .
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+
+    $padrão  reduzir usando a regra 138 (operacao_inteira)
+
+
+Estado 122
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL . T_INT T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 141
+
+
+Estado 123
+
+   63 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL . T_INT T_END_LINE
+   64                      | T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL . chamada_funcao T_END_LINE
+
+    T_INT    deslocar, e ir ao estado 142
+    T_IDENT  deslocar, e ir ao estado 143
+
+    chamada_funcao  ir ao estado 144
+
+
+Estado 124
+
+   77 identificador_string: T_STRING_TIPO T_IDENT T_EQUAL T_LITERAL T_END_LINE .
+
+    $padrão  reduzir usando a regra 77 (identificador_string)
+
+
+Estado 125
+
+   78 identificador_string: T_STRING_TIPO T_IDENT T_EQUAL T_STR T_END_LINE .
+
+    $padrão  reduzir usando a regra 78 (identificador_string)
+
+
+Estado 126
+
+   79 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+   81                     | T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_END_LINE     deslocar, e ir ao estado 145
+    T_DOIS_PONTOS  deslocar, e ir ao estado 146
+
+
+Estado 127
+
+   87 identificador_bool: T_BOOL_TIPO T_IDENT T_EQUAL booleano T_END_LINE .
+
+    $padrão  reduzir usando a regra 87 (identificador_bool)
+
+
+Estado 128
+
+   88 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+   89                   | T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_END_LINE     deslocar, e ir ao estado 147
+    T_DOIS_PONTOS  deslocar, e ir ao estado 148
+
+
+Estado 129
+
+   69 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL T_REAL T_END_LINE .
+
+    $padrão  reduzir usando a regra 69 (identificador_float)
+
+
+Estado 130
+
+   70 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL T_MINUS T_REAL . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 149
+
+
+Estado 131
+
+   71 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+   72                    | T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_END_LINE     deslocar, e ir ao estado 150
+    T_DOIS_PONTOS  deslocar, e ir ao estado 151
+
+
+Estado 132
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros . T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 152
+
+
+Estado 133
+
+   12 parametros: tipo T_IDENT .
+   13           | tipo T_IDENT . T_VIRGULA parametros
+
+    T_VIRGULA  deslocar, e ir ao estado 153
+
+    $padrão  reduzir usando a regra 12 (parametros)
+
+
+Estado 134
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT . T_CHA_LEFT escopo retorno T_CHA_RIGHT
+
+    T_CHA_LEFT  deslocar, e ir ao estado 154
+
+
+Estado 135
+
+   56 identificador_inteiro: novo_inteiro T_EQUAL T_MINUS T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 56 (identificador_inteiro)
+
+
+Estado 136
+
+   57 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 57 (identificador_inteiro)
+
+
+Estado 137
+
+   58 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS . valores_vetor_int T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 155
+
+    valores_vetor_int  ir ao estado 156
+
+
+Estado 138
+
+   18 parametros_chamada: T_INT T_VIRGULA . parametros_chamada
+
+    T_INT    deslocar, e ir ao estado 112
+    T_IDENT  deslocar, e ir ao estado 113
+
+    $padrão  reduzir usando a regra 19 (parametros_chamada)
+
+    parametros_chamada  ir ao estado 157
+
+
+Estado 139
+
+   16 parametros_chamada: T_IDENT T_VIRGULA . parametros_chamada
+
+    T_INT    deslocar, e ir ao estado 112
+    T_IDENT  deslocar, e ir ao estado 113
+
+    $padrão  reduzir usando a regra 19 (parametros_chamada)
+
+    parametros_chamada  ir ao estado 158
+
+
+Estado 140
+
+   23 chamada_funcao: T_IDENT T_PAR_LEFT parametros_chamada T_PAR_RIGHT .
+
+    $padrão  reduzir usando a regra 23 (chamada_funcao)
+
+
+Estado 141
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL T_INT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 159
+
+
+Estado 142
+
+   63 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL T_INT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 160
+
+
+Estado 143
+
+   23 chamada_funcao: T_IDENT . T_PAR_LEFT parametros_chamada T_PAR_RIGHT
+
+    T_PAR_LEFT  deslocar, e ir ao estado 71
+
+
+Estado 144
+
+   64 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 161
+
+
+Estado 145
+
+   79 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 79 (identificador_string)
+
+
+Estado 146
+
+   81 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS . valores_vetor_string T_END_LINE
+
+    T_LITERAL  deslocar, e ir ao estado 162
+    T_STR      deslocar, e ir ao estado 163
+
+    valores_vetor_string  ir ao estado 164
+    string                ir ao estado 165
+
+
+Estado 147
+
+   88 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 88 (identificador_bool)
+
+
+Estado 148
+
+   89 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS . valores_vetor_bool T_END_LINE
+
+    T_INT    deslocar, e ir ao estado 87
+    T_TRUE   deslocar, e ir ao estado 88
+    T_FALSE  deslocar, e ir ao estado 89
+
+    valores_vetor_bool  ir ao estado 166
+    booleano            ir ao estado 167
+
+
+Estado 149
+
+   70 identificador_float: T_REAL_TIPO T_IDENT T_EQUAL T_MINUS T_REAL T_END_LINE .
+
+    $padrão  reduzir usando a regra 70 (identificador_float)
+
+
+Estado 150
+
+   71 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 71 (identificador_float)
+
+
+Estado 151
+
+   72 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS . valores_vetor_float T_END_LINE
+
+    T_REAL  deslocar, e ir ao estado 168
+
+    valores_vetor_float  ir ao estado 169
+
+
+Estado 152
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT . T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT
+
+    T_CHA_LEFT  deslocar, e ir ao estado 170
+
+
+Estado 153
+
+   13 parametros: tipo T_IDENT T_VIRGULA . parametros
+
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    $padrão  reduzir usando a regra 14 (parametros)
+
+    tipo        ir ao estado 96
+    parametros  ir ao estado 171
+
+
+Estado 154
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT . escopo retorno T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 189
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 155
+
+   66 valores_vetor_int: T_INT .
+   67                  | T_INT . valores_vetor_int
+
+    T_INT  deslocar, e ir ao estado 155
+
+    $padrão  reduzir usando a regra 66 (valores_vetor_int)
+
+    valores_vetor_int  ir ao estado 206
+
+
+Estado 156
+
+   58 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 207
+
+
+Estado 157
+
+   18 parametros_chamada: T_INT T_VIRGULA parametros_chamada .
+
+    $padrão  reduzir usando a regra 18 (parametros_chamada)
+
+
+Estado 158
+
+   16 parametros_chamada: T_IDENT T_VIRGULA parametros_chamada .
+
+    $padrão  reduzir usando a regra 16 (parametros_chamada)
+
+
+Estado 159
+
+   62 identificador_inteiro: T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 62 (identificador_inteiro)
+
+
+Estado 160
+
+   63 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 63 (identificador_inteiro)
+
+
+Estado 161
+
+   64 identificador_inteiro: T_IDENT T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE .
+
+    $padrão  reduzir usando a regra 64 (identificador_inteiro)
+
+
+Estado 162
+
+   85 string: T_LITERAL .
+
+    $padrão  reduzir usando a regra 85 (string)
+
+
+Estado 163
+
+   84 valores_vetor_string: T_STR . valores_vetor_string
+
+    T_LITERAL  deslocar, e ir ao estado 162
+    T_STR      deslocar, e ir ao estado 163
+
+    valores_vetor_string  ir ao estado 208
+    string                ir ao estado 165
+
+
+Estado 164
+
+   81 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 209
+
+
+Estado 165
+
+   83 valores_vetor_string: string .
+
+    $padrão  reduzir usando a regra 83 (valores_vetor_string)
+
+
+Estado 166
+
+   89 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 210
+
+
+Estado 167
+
+   91 valores_vetor_bool: booleano . valores_vetor_float
+
+    T_REAL  deslocar, e ir ao estado 168
+
+    valores_vetor_float  ir ao estado 211
+
+
+Estado 168
+
+   74 valores_vetor_float: T_REAL .
+   75                    | T_REAL . valores_vetor_float
+
+    T_REAL  deslocar, e ir ao estado 168
+
+    $padrão  reduzir usando a regra 74 (valores_vetor_float)
+
+    valores_vetor_float  ir ao estado 212
+
+
+Estado 169
+
+   72 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 213
+
+
+Estado 170
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT . $@1 escopo $@2 T_CHA_RIGHT
+
+    $padrão  reduzir usando a regra 20 ($@1)
+
+    $@1  ir ao estado 214
+
+
+Estado 171
+
+   13 parametros: tipo T_IDENT T_VIRGULA parametros .
+
+    $padrão  reduzir usando a regra 13 (parametros)
+
+
+Estado 172
+
+  125 operacao: T_INT . T_END_LINE
+  131 operacao_inteira: T_INT . T_PLUS T_INT
+  132                 | T_INT . T_PLUS T_IDENT
+
+    T_END_LINE  deslocar, e ir ao estado 215
+    T_PLUS      deslocar, e ir ao estado 65
+
+
+Estado 173
+
+  143 operacao_real: T_REAL .
+
+    $padrão  reduzir usando a regra 143 (operacao_real)
+
+
+Estado 174
+
+   23 chamada_funcao: T_IDENT . T_PAR_LEFT parametros_chamada T_PAR_RIGHT
+   59 identificador_inteiro: T_IDENT . T_EQUAL T_INT T_END_LINE
+   60                      | T_IDENT . T_EQUAL chamada_funcao T_END_LINE
+   61                      | T_IDENT . T_EQUAL operacao_inteira T_END_LINE
+   62                      | T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   63                      | T_IDENT . T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL T_INT T_END_LINE
+   64                      | T_IDENT . T_COL_LEFT T_IDENT T_COL_RIGHT T_EQUAL chamada_funcao T_END_LINE
+   73 identificador_float: T_IDENT . T_EQUAL T_REAL T_END_LINE
+   80 identificador_string: T_IDENT . T_EQUAL operacao_string T_END_LINE
+   82                     | T_IDENT . T_EQUAL string T_END_LINE
+   90 identificador_bool: T_IDENT . T_EQUAL T_INT
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+  161 operacao_logica: T_IDENT . T_OR operacao_logica
+  164                | T_IDENT . T_MORE operacao_logica
+  165                | T_IDENT . T_MORE T_INT
+  167                | T_IDENT . T_LESS operacao_logica
+  168                | T_IDENT . T_LESS T_INT
+  170                | T_IDENT . T_EQQ operacao_logica
+  171                | T_IDENT . T_EQQ T_INT
+  172 operacao_string: T_IDENT . T_APPEND T_LITERAL
+
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+    T_APPEND    deslocar, e ir ao estado 70
+    T_PAR_LEFT  deslocar, e ir ao estado 71
+    T_EQQ       deslocar, e ir ao estado 216
+    T_LESS      deslocar, e ir ao estado 217
+    T_MORE      deslocar, e ir ao estado 218
+    T_EQUAL     deslocar, e ir ao estado 16
+    T_OR        deslocar, e ir ao estado 219
+    T_COL_LEFT  deslocar, e ir ao estado 17
+
+
+Estado 175
+
+  129 operacao: T_LITERAL . T_END_LINE
+  173 operacao_string: T_LITERAL . T_APPEND T_IDENT
+  174                | T_LITERAL . T_APPEND T_LITERAL
+
+    T_END_LINE  deslocar, e ir ao estado 220
+    T_APPEND    deslocar, e ir ao estado 72
+
+
+Estado 176
+
+  158 operacao_logica: T_TRUE .
+
+    $padrão  reduzir usando a regra 158 (operacao_logica)
+
+
+Estado 177
+
+  159 operacao_logica: T_FALSE .
+
+    $padrão  reduzir usando a regra 159 (operacao_logica)
+
+
+Estado 178
+
+   76 identificador_string: T_STRING_TIPO . T_IDENT T_END_LINE
+   77                     | T_STRING_TIPO . T_IDENT T_EQUAL T_LITERAL T_END_LINE
+   78                     | T_STRING_TIPO . T_IDENT T_EQUAL T_STR T_END_LINE
+   79                     | T_STRING_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   81                     | T_STRING_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 18
+
+
+Estado 179
+
+   86 identificador_bool: T_BOOL_TIPO . T_IDENT T_END_LINE
+   87                   | T_BOOL_TIPO . T_IDENT T_EQUAL booleano T_END_LINE
+   88                   | T_BOOL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   89                   | T_BOOL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 19
+
+
+Estado 180
+
+   65 novo_inteiro: T_INT_TIPO . T_IDENT
+
+    T_IDENT  deslocar, e ir ao estado 20
+
+
+Estado 181
+
+   68 identificador_float: T_REAL_TIPO . T_IDENT T_END_LINE
+   69                    | T_REAL_TIPO . T_IDENT T_EQUAL T_REAL T_END_LINE
+   70                    | T_REAL_TIPO . T_IDENT T_EQUAL T_MINUS T_REAL T_END_LINE
+   71                    | T_REAL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+   72                    | T_REAL_TIPO . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 21
+
+
+Estado 182
+
+   45 retorno: T_RETURN . T_IDENT T_END_LINE
+   46        | T_RETURN . T_IDENT T_COL_LEFT T_INT T_CHA_RIGHT T_END_LINE
+   47        | T_RETURN . operacao
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 221
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao          ir ao estado 222
+    operacao_inteira  ir ao estado 202
+    operacao_real     ir ao estado 203
+    operacao_logica   ir ao estado 204
+    operacao_string   ir ao estado 205
+
+
+Estado 183
+
+  104 selecao_uma_linha: T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+  106 selecao_varias_linhas: T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else
+
+    T_PAR_LEFT  deslocar, e ir ao estado 223
+
+
+Estado 184
+
+   96 repeticao_uma_linha: T_FOR . T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   97                    | T_FOR . T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR . T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  100                        | T_FOR . T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_PAR_LEFT  deslocar, e ir ao estado 224
+
+
+Estado 185
+
+  118 saida: T_PRINT . $@5 argumentos_print $@6 T_END_LINE
+  119      | T_PRINT . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  120      | T_PRINT . T_IDENT T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 225
+
+    $padrão  reduzir usando a regra 116 ($@5)
+
+    $@5  ir ao estado 226
+
+
+Estado 186
+
+  114 entrada: T_READ . T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  115        | T_READ . T_IDENT T_END_LINE
+
+    T_IDENT  deslocar, e ir ao estado 227
+
+
+Estado 187
+
+  142 operacao_inteira: T_PAR_LEFT . operacao_inteira T_PAR_RIGHT
+  156 operacao_real: T_PAR_LEFT . operacao_real T_PAR_RIGHT
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 228
+    operacao_real     ir ao estado 229
+
+
+Estado 188
+
+   26 escopo: chamada_funcao .
+
+    $padrão  reduzir usando a regra 26 (escopo)
+
+
+Estado 189
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo . retorno T_CHA_RIGHT
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    retorno                  ir ao estado 231
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 190
+
+   40 escopo: retorno .
+
+    $padrão  reduzir usando a regra 40 (escopo)
+
+
+Estado 191
+
+   24 escopo: identificadores .
+
+    $padrão  reduzir usando a regra 24 (escopo)
+
+
+Estado 192
+
+   30 escopo: repeticao_uma_linha .
+
+    $padrão  reduzir usando a regra 30 (escopo)
+
+
+Estado 193
+
+   28 escopo: repeticao_varias_linhas .
+
+    $padrão  reduzir usando a regra 28 (escopo)
+
+
+Estado 194
+
+   95 repeticao_uma_linha: while_init . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   98 repeticao_varias_linhas: while_init . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_PAR_LEFT  deslocar, e ir ao estado 239
+
+
+Estado 195
+
+  103 while_init: $@3 . T_WHILE
+
+    T_WHILE  deslocar, e ir ao estado 240
+
+
+Estado 196
+
+   34 escopo: selecao_uma_linha .
+
+    $padrão  reduzir usando a regra 34 (escopo)
+
+
+Estado 197
+
+   32 escopo: selecao_varias_linhas .
+
+    $padrão  reduzir usando a regra 32 (escopo)
+
+
+Estado 198
+
+   36 escopo: io .
+
+    $padrão  reduzir usando a regra 36 (escopo)
+
+
+Estado 199
+
+  112 io: entrada .
+
+    $padrão  reduzir usando a regra 112 (io)
+
+
+Estado 200
+
+  113 io: saida .
+
+    $padrão  reduzir usando a regra 113 (io)
+
+
+Estado 201
+
+   38 escopo: operacao .
+
+    $padrão  reduzir usando a regra 38 (escopo)
+
+
+Estado 202
+
+  124 operacao: operacao_inteira . T_END_LINE
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_END_LINE  deslocar, e ir ao estado 241
+    T_PLUS      deslocar, e ir ao estado 242
+    T_MINUS     deslocar, e ir ao estado 79
+    T_MULTIPLY  deslocar, e ir ao estado 243
+    T_DIVIDE    deslocar, e ir ao estado 244
+    T_LESS      deslocar, e ir ao estado 245
+
+
+Estado 203
+
+  127 operacao: operacao_real . T_END_LINE
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    T_END_LINE  deslocar, e ir ao estado 246
+    T_PLUS      deslocar, e ir ao estado 247
+    T_MINUS     deslocar, e ir ao estado 248
+    T_MULTIPLY  deslocar, e ir ao estado 249
+    T_DIVIDE    deslocar, e ir ao estado 250
+
+
+Estado 204
+
+  126 operacao: operacao_logica . T_END_LINE
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_END_LINE  deslocar, e ir ao estado 251
+    T_EQQ       deslocar, e ir ao estado 252
+    T_LESS      deslocar, e ir ao estado 253
+    T_MORE      deslocar, e ir ao estado 254
+    T_OR        deslocar, e ir ao estado 255
+    T_AND       deslocar, e ir ao estado 256
+
+
+Estado 205
+
+  128 operacao: operacao_string . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 257
+
+
+Estado 206
+
+   67 valores_vetor_int: T_INT valores_vetor_int .
+
+    $padrão  reduzir usando a regra 67 (valores_vetor_int)
+
+
+Estado 207
+
+   58 identificador_inteiro: novo_inteiro T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_int T_END_LINE .
+
+    $padrão  reduzir usando a regra 58 (identificador_inteiro)
+
+
+Estado 208
+
+   84 valores_vetor_string: T_STR valores_vetor_string .
+
+    $padrão  reduzir usando a regra 84 (valores_vetor_string)
+
+
+Estado 209
+
+   81 identificador_string: T_STRING_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_string T_END_LINE .
+
+    $padrão  reduzir usando a regra 81 (identificador_string)
+
+
+Estado 210
+
+   89 identificador_bool: T_BOOL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_bool T_END_LINE .
+
+    $padrão  reduzir usando a regra 89 (identificador_bool)
+
+
+Estado 211
+
+   91 valores_vetor_bool: booleano valores_vetor_float .
+
+    $padrão  reduzir usando a regra 91 (valores_vetor_bool)
+
+
+Estado 212
+
+   75 valores_vetor_float: T_REAL valores_vetor_float .
+
+    $padrão  reduzir usando a regra 75 (valores_vetor_float)
+
+
+Estado 213
+
+   72 identificador_float: T_REAL_TIPO T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_DOIS_PONTOS valores_vetor_float T_END_LINE .
+
+    $padrão  reduzir usando a regra 72 (identificador_float)
+
+
+Estado 214
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 . escopo $@2 T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 258
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 215
+
+  125 operacao: T_INT T_END_LINE .
+
+    $padrão  reduzir usando a regra 125 (operacao)
+
+
+Estado 216
+
+  170 operacao_logica: T_IDENT T_EQQ . operacao_logica
+  171                | T_IDENT T_EQQ . T_INT
+
+    T_INT    deslocar, e ir ao estado 259
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 261
+
+
+Estado 217
+
+  167 operacao_logica: T_IDENT T_LESS . operacao_logica
+  168                | T_IDENT T_LESS . T_INT
+
+    T_INT    deslocar, e ir ao estado 262
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 263
+
+
+Estado 218
+
+  164 operacao_logica: T_IDENT T_MORE . operacao_logica
+  165                | T_IDENT T_MORE . T_INT
+
+    T_INT    deslocar, e ir ao estado 264
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 265
+
+
+Estado 219
+
+  161 operacao_logica: T_IDENT T_OR . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 266
+
+
+Estado 220
+
+  129 operacao: T_LITERAL T_END_LINE .
+
+    $padrão  reduzir usando a regra 129 (operacao)
+
+
+Estado 221
+
+   45 retorno: T_RETURN T_IDENT . T_END_LINE
+   46        | T_RETURN T_IDENT . T_COL_LEFT T_INT T_CHA_RIGHT T_END_LINE
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+  161 operacao_logica: T_IDENT . T_OR operacao_logica
+  164                | T_IDENT . T_MORE operacao_logica
+  165                | T_IDENT . T_MORE T_INT
+  167                | T_IDENT . T_LESS operacao_logica
+  168                | T_IDENT . T_LESS T_INT
+  170                | T_IDENT . T_EQQ operacao_logica
+  171                | T_IDENT . T_EQQ T_INT
+  172 operacao_string: T_IDENT . T_APPEND T_LITERAL
+
+    T_END_LINE  deslocar, e ir ao estado 267
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+    T_APPEND    deslocar, e ir ao estado 70
+    T_EQQ       deslocar, e ir ao estado 216
+    T_LESS      deslocar, e ir ao estado 217
+    T_MORE      deslocar, e ir ao estado 218
+    T_OR        deslocar, e ir ao estado 219
+    T_COL_LEFT  deslocar, e ir ao estado 268
+
+
+Estado 222
+
+   47 retorno: T_RETURN operacao .
+
+    $padrão  reduzir usando a regra 47 (retorno)
+
+
+Estado 223
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica_label  ir ao estado 269
+    operacao_logica        ir ao estado 270
+
+
+Estado 224
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT . tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   97                    | T_FOR T_PAR_LEFT . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT . tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  100                        | T_FOR T_PAR_LEFT . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_IDENT        deslocar, e ir ao estado 271
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    tipo             ir ao estado 272
+    repeticao_label  ir ao estado 273
+
+
+Estado 225
+
+  119 saida: T_PRINT T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  120      | T_PRINT T_IDENT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 274
+    T_COL_LEFT  deslocar, e ir ao estado 275
+
+
+Estado 226
+
+  118 saida: T_PRINT $@5 . argumentos_print $@6 T_END_LINE
+
+    T_LITERAL  deslocar, e ir ao estado 162
+    T_VIRGULA  deslocar, e ir ao estado 276
+
+    string            ir ao estado 277
+    argumentos_print  ir ao estado 278
+
+
+Estado 227
+
+  114 entrada: T_READ T_IDENT . T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE
+  115        | T_READ T_IDENT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 279
+    T_COL_LEFT  deslocar, e ir ao estado 280
+
+
+Estado 228
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  142                 | T_PAR_LEFT operacao_inteira . T_PAR_RIGHT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_PLUS       deslocar, e ir ao estado 242
+    T_MINUS      deslocar, e ir ao estado 79
+    T_MULTIPLY   deslocar, e ir ao estado 243
+    T_DIVIDE     deslocar, e ir ao estado 244
+    T_PAR_RIGHT  deslocar, e ir ao estado 117
+    T_LESS       deslocar, e ir ao estado 245
+
+
+Estado 229
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+  156              | T_PAR_LEFT operacao_real . T_PAR_RIGHT
+
+    T_PLUS       deslocar, e ir ao estado 247
+    T_MINUS      deslocar, e ir ao estado 248
+    T_MULTIPLY   deslocar, e ir ao estado 249
+    T_DIVIDE     deslocar, e ir ao estado 250
+    T_PAR_RIGHT  deslocar, e ir ao estado 281
+
+
+Estado 230
+
+   27 escopo: escopo chamada_funcao .
+
+    $padrão  reduzir usando a regra 27 (escopo)
+
+
+Estado 231
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno . T_CHA_RIGHT
+
+    T_CHA_RIGHT  deslocar, e ir ao estado 282
+
+
+Estado 232
+
+   25 escopo: escopo identificadores .
+
+    $padrão  reduzir usando a regra 25 (escopo)
+
+
+Estado 233
+
+   31 escopo: escopo repeticao_uma_linha .
+
+    $padrão  reduzir usando a regra 31 (escopo)
+
+
+Estado 234
+
+   29 escopo: escopo repeticao_varias_linhas .
+
+    $padrão  reduzir usando a regra 29 (escopo)
+
+
+Estado 235
+
+   35 escopo: escopo selecao_uma_linha .
+
+    $padrão  reduzir usando a regra 35 (escopo)
+
+
+Estado 236
+
+   33 escopo: escopo selecao_varias_linhas .
+
+    $padrão  reduzir usando a regra 33 (escopo)
+
+
+Estado 237
+
+   37 escopo: escopo io .
+
+    $padrão  reduzir usando a regra 37 (escopo)
+
+
+Estado 238
+
+   39 escopo: escopo operacao .
+
+    $padrão  reduzir usando a regra 39 (escopo)
+
+
+Estado 239
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica_label  ir ao estado 283
+    operacao_logica        ir ao estado 270
+
+
+Estado 240
+
+  103 while_init: $@3 T_WHILE .
+
+    $padrão  reduzir usando a regra 103 (while_init)
+
+
+Estado 241
+
+  124 operacao: operacao_inteira T_END_LINE .
+
+    $padrão  reduzir usando a regra 124 (operacao)
+
+
+Estado 242
+
+  148 operacao_real: operacao_inteira T_PLUS . operacao_real
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 284
+    operacao_real     ir ao estado 285
+
+
+Estado 243
+
+  138 operacao_inteira: operacao_inteira T_MULTIPLY . operacao_inteira
+  139                 | operacao_inteira T_MULTIPLY . T_IDENT
+  150 operacao_real: operacao_inteira T_MULTIPLY . operacao_real
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 120
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 286
+    operacao_real     ir ao estado 287
+
+
+Estado 244
+
+  151 operacao_real: operacao_inteira T_DIVIDE . operacao_real
+  157              | operacao_inteira T_DIVIDE . operacao_inteira
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 288
+    operacao_real     ir ao estado 289
+
+
+Estado 245
+
+  149 operacao_real: operacao_inteira T_LESS . operacao_real
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 284
+    operacao_real     ir ao estado 290
+
+
+Estado 246
+
+  127 operacao: operacao_real T_END_LINE .
+
+    $padrão  reduzir usando a regra 127 (operacao)
+
+
+Estado 247
+
+  144 operacao_real: operacao_real T_PLUS . operacao_real
+  152              | operacao_real T_PLUS . operacao_inteira
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 291
+    operacao_real     ir ao estado 292
+
+
+Estado 248
+
+  145 operacao_real: operacao_real T_MINUS . operacao_real
+  153              | operacao_real T_MINUS . operacao_inteira
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 293
+    operacao_real     ir ao estado 294
+
+
+Estado 249
+
+  146 operacao_real: operacao_real T_MULTIPLY . operacao_real
+  154              | operacao_real T_MULTIPLY . operacao_inteira
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 295
+    operacao_real     ir ao estado 296
+
+
+Estado 250
+
+  147 operacao_real: operacao_real T_DIVIDE . operacao_real
+  155              | operacao_real T_DIVIDE . operacao_inteira
+
+    T_INT       deslocar, e ir ao estado 73
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 74
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    operacao_inteira  ir ao estado 297
+    operacao_real     ir ao estado 298
+
+
+Estado 251
+
+  126 operacao: operacao_logica T_END_LINE .
+
+    $padrão  reduzir usando a regra 126 (operacao)
+
+
+Estado 252
+
+  169 operacao_logica: operacao_logica T_EQQ . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 299
+
+
+Estado 253
+
+  166 operacao_logica: operacao_logica T_LESS . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 300
+
+
+Estado 254
+
+  163 operacao_logica: operacao_logica T_MORE . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 301
+
+
+Estado 255
+
+  160 operacao_logica: operacao_logica T_OR . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 302
+
+
+Estado 256
+
+  162 operacao_logica: operacao_logica T_AND . operacao_logica
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica  ir ao estado 303
+
+
+Estado 257
+
+  128 operacao: operacao_string T_END_LINE .
+
+    $padrão  reduzir usando a regra 128 (operacao)
+
+
+Estado 258
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo . $@2 T_CHA_RIGHT
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    T_WHILE   reduzir usando a regra 102 ($@3)
+    $padrão  reduzir usando a regra 21 ($@2)
+
+    $@2                      ir ao estado 304
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 259
+
+  171 operacao_logica: T_IDENT T_EQQ T_INT .
+
+    $padrão  reduzir usando a regra 171 (operacao_logica)
+
+
+Estado 260
+
+  161 operacao_logica: T_IDENT . T_OR operacao_logica
+  164                | T_IDENT . T_MORE operacao_logica
+  165                | T_IDENT . T_MORE T_INT
+  167                | T_IDENT . T_LESS operacao_logica
+  168                | T_IDENT . T_LESS T_INT
+  170                | T_IDENT . T_EQQ operacao_logica
+  171                | T_IDENT . T_EQQ T_INT
+
+    T_EQQ   deslocar, e ir ao estado 216
+    T_LESS  deslocar, e ir ao estado 217
+    T_MORE  deslocar, e ir ao estado 218
+    T_OR    deslocar, e ir ao estado 219
+
+
+Estado 261
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+  170                | T_IDENT T_EQQ operacao_logica .
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 170 (operacao_logica)
+
+
+Estado 262
+
+  168 operacao_logica: T_IDENT T_LESS T_INT .
+
+    $padrão  reduzir usando a regra 168 (operacao_logica)
+
+
+Estado 263
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  167                | T_IDENT T_LESS operacao_logica .
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 167 (operacao_logica)
+
+
+Estado 264
+
+  165 operacao_logica: T_IDENT T_MORE T_INT .
+
+    $padrão  reduzir usando a regra 165 (operacao_logica)
+
+
+Estado 265
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  164                | T_IDENT T_MORE operacao_logica .
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 164 (operacao_logica)
+
+
+Estado 266
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  161                | T_IDENT T_OR operacao_logica .
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    $padrão  reduzir usando a regra 161 (operacao_logica)
+
+
+Estado 267
+
+   45 retorno: T_RETURN T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 45 (retorno)
+
+
+Estado 268
+
+   46 retorno: T_RETURN T_IDENT T_COL_LEFT . T_INT T_CHA_RIGHT T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 305
+
+
+Estado 269
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 306
+
+
+Estado 270
+
+  111 operacao_logica_label: operacao_logica .
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_EQQ   deslocar, e ir ao estado 252
+    T_LESS  deslocar, e ir ao estado 253
+    T_MORE  deslocar, e ir ao estado 254
+    T_OR    deslocar, e ir ao estado 255
+    T_AND   deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 111 (operacao_logica_label)
+
+
+Estado 271
+
+  101 repeticao_label: T_IDENT . T_DOIS_PONTOS T_INT
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 307
+
+
+Estado 272
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_IDENT  deslocar, e ir ao estado 271
+
+    repeticao_label  ir ao estado 308
+
+
+Estado 273
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_VIRGULA  deslocar, e ir ao estado 309
+
+
+Estado 274
+
+  120 saida: T_PRINT T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 120 (saida)
+
+
+Estado 275
+
+  119 saida: T_PRINT T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 310
+
+
+Estado 276
+
+  123 argumentos_print: T_VIRGULA . string
+
+    T_LITERAL  deslocar, e ir ao estado 162
+
+    string  ir ao estado 311
+
+
+Estado 277
+
+  121 argumentos_print: string .
+  122                 | string . argumentos_print
+
+    T_LITERAL  deslocar, e ir ao estado 162
+    T_VIRGULA  deslocar, e ir ao estado 276
+
+    $padrão  reduzir usando a regra 121 (argumentos_print)
+
+    string            ir ao estado 277
+    argumentos_print  ir ao estado 312
+
+
+Estado 278
+
+  118 saida: T_PRINT $@5 argumentos_print . $@6 T_END_LINE
+
+    $padrão  reduzir usando a regra 117 ($@6)
+
+    $@6  ir ao estado 313
+
+
+Estado 279
+
+  115 entrada: T_READ T_IDENT T_END_LINE .
+
+    $padrão  reduzir usando a regra 115 (entrada)
+
+
+Estado 280
+
+  114 entrada: T_READ T_IDENT T_COL_LEFT . T_INT T_COL_RIGHT T_END_LINE
+
+    T_INT  deslocar, e ir ao estado 314
+
+
+Estado 281
+
+  156 operacao_real: T_PAR_LEFT operacao_real T_PAR_RIGHT .
+
+    $padrão  reduzir usando a regra 156 (operacao_real)
+
+
+Estado 282
+
+    7 main: tipo T_MAIN T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT escopo retorno T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 7 (main)
+
+
+Estado 283
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 315
+
+
+Estado 284
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_PLUS      deslocar, e ir ao estado 242
+    T_MINUS     deslocar, e ir ao estado 79
+    T_MULTIPLY  deslocar, e ir ao estado 243
+    T_DIVIDE    deslocar, e ir ao estado 244
+    T_LESS      deslocar, e ir ao estado 245
+
+
+Estado 285
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  148              | operacao_inteira T_PLUS operacao_real .
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    T_MULTIPLY  deslocar, e ir ao estado 249
+    T_DIVIDE    deslocar, e ir ao estado 250
+
+    $padrão  reduzir usando a regra 148 (operacao_real)
+
+
+Estado 286
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  138                 | operacao_inteira T_MULTIPLY operacao_inteira .
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_LESS  deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 138 (operacao_inteira)
+
+
+Estado 287
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  150              | operacao_inteira T_MULTIPLY operacao_real .
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    $padrão  reduzir usando a regra 150 (operacao_real)
+
+
+Estado 288
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+  157              | operacao_inteira T_DIVIDE operacao_inteira .
+
+    T_LESS  deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 157 (operacao_real)
+
+
+Estado 289
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  151              | operacao_inteira T_DIVIDE operacao_real .
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    $padrão  reduzir usando a regra 151 (operacao_real)
+
+
+Estado 290
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  149              | operacao_inteira T_LESS operacao_real .
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    $padrão  reduzir usando a regra 149 (operacao_real)
+
+
+Estado 291
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  152              | operacao_real T_PLUS operacao_inteira .
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_MULTIPLY  deslocar, e ir ao estado 243
+    T_DIVIDE    deslocar, e ir ao estado 244
+    T_LESS      deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 152 (operacao_real)
+
+
+Estado 292
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  144              | operacao_real T_PLUS operacao_real .
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    T_MULTIPLY  deslocar, e ir ao estado 249
+    T_DIVIDE    deslocar, e ir ao estado 250
+
+    $padrão  reduzir usando a regra 144 (operacao_real)
+
+
+Estado 293
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  153              | operacao_real T_MINUS operacao_inteira .
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_MULTIPLY  deslocar, e ir ao estado 243
+    T_DIVIDE    deslocar, e ir ao estado 244
+    T_LESS      deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 153 (operacao_real)
+
+
+Estado 294
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  145              | operacao_real T_MINUS operacao_real .
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    T_MULTIPLY  deslocar, e ir ao estado 249
+    T_DIVIDE    deslocar, e ir ao estado 250
+
+    $padrão  reduzir usando a regra 145 (operacao_real)
+
+
+Estado 295
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  154              | operacao_real T_MULTIPLY operacao_inteira .
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_LESS  deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 154 (operacao_real)
+
+
+Estado 296
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  146              | operacao_real T_MULTIPLY operacao_real .
+  147              | operacao_real . T_DIVIDE operacao_real
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    $padrão  reduzir usando a regra 146 (operacao_real)
+
+
+Estado 297
+
+  134 operacao_inteira: operacao_inteira . T_MINUS operacao_inteira
+  135                 | operacao_inteira . T_MINUS T_IDENT
+  138                 | operacao_inteira . T_MULTIPLY operacao_inteira
+  139                 | operacao_inteira . T_MULTIPLY T_IDENT
+  148 operacao_real: operacao_inteira . T_PLUS operacao_real
+  149              | operacao_inteira . T_LESS operacao_real
+  150              | operacao_inteira . T_MULTIPLY operacao_real
+  151              | operacao_inteira . T_DIVIDE operacao_real
+  155              | operacao_real T_DIVIDE operacao_inteira .
+  157              | operacao_inteira . T_DIVIDE operacao_inteira
+
+    T_LESS  deslocar, e ir ao estado 245
+
+    $padrão  reduzir usando a regra 155 (operacao_real)
+
+
+Estado 298
+
+  144 operacao_real: operacao_real . T_PLUS operacao_real
+  145              | operacao_real . T_MINUS operacao_real
+  146              | operacao_real . T_MULTIPLY operacao_real
+  147              | operacao_real . T_DIVIDE operacao_real
+  147              | operacao_real T_DIVIDE operacao_real .
+  152              | operacao_real . T_PLUS operacao_inteira
+  153              | operacao_real . T_MINUS operacao_inteira
+  154              | operacao_real . T_MULTIPLY operacao_inteira
+  155              | operacao_real . T_DIVIDE operacao_inteira
+
+    $padrão  reduzir usando a regra 147 (operacao_real)
+
+
+Estado 299
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+  169                | operacao_logica T_EQQ operacao_logica .
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 169 (operacao_logica)
+
+
+Estado 300
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  166                | operacao_logica T_LESS operacao_logica .
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 166 (operacao_logica)
+
+
+Estado 301
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  163                | operacao_logica T_MORE operacao_logica .
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    T_OR   deslocar, e ir ao estado 255
+    T_AND  deslocar, e ir ao estado 256
+
+    $padrão  reduzir usando a regra 163 (operacao_logica)
+
+
+Estado 302
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  160                | operacao_logica T_OR operacao_logica .
+  162                | operacao_logica . T_AND operacao_logica
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    $padrão  reduzir usando a regra 160 (operacao_logica)
+
+
+Estado 303
+
+  160 operacao_logica: operacao_logica . T_OR operacao_logica
+  162                | operacao_logica . T_AND operacao_logica
+  162                | operacao_logica T_AND operacao_logica .
+  163                | operacao_logica . T_MORE operacao_logica
+  166                | operacao_logica . T_LESS operacao_logica
+  169                | operacao_logica . T_EQQ operacao_logica
+
+    $padrão  reduzir usando a regra 162 (operacao_logica)
+
+
+Estado 304
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 . T_CHA_RIGHT
+
+    T_CHA_RIGHT  deslocar, e ir ao estado 316
+
+
+Estado 305
+
+   46 retorno: T_RETURN T_IDENT T_COL_LEFT T_INT . T_CHA_RIGHT T_END_LINE
+
+    T_CHA_RIGHT  deslocar, e ir ao estado 317
+
+
+Estado 306
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico else
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 318
+
+
+Estado 307
+
+  101 repeticao_label: T_IDENT T_DOIS_PONTOS . T_INT
+
+    T_INT  deslocar, e ir ao estado 319
+
+
+Estado 308
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_VIRGULA  deslocar, e ir ao estado 320
+
+
+Estado 309
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT  deslocar, e ir ao estado 321
+
+
+Estado 310
+
+  119 saida: T_PRINT T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 322
+
+
+Estado 311
+
+  123 argumentos_print: T_VIRGULA string .
+
+    $padrão  reduzir usando a regra 123 (argumentos_print)
+
+
+Estado 312
+
+  122 argumentos_print: string argumentos_print .
+
+    $padrão  reduzir usando a regra 122 (argumentos_print)
+
+
+Estado 313
+
+  118 saida: T_PRINT $@5 argumentos_print $@6 . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 323
+
+
+Estado 314
+
+  114 entrada: T_READ T_IDENT T_COL_LEFT T_INT . T_COL_RIGHT T_END_LINE
+
+    T_COL_RIGHT  deslocar, e ir ao estado 324
+
+
+Estado 315
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 325
+
+
+Estado 316
+
+   22 funcao: tipo T_IDENT T_PAR_LEFT parametros T_PAR_RIGHT T_CHA_LEFT $@1 escopo $@2 T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 22 (funcao)
+
+
+Estado 317
+
+   46 retorno: T_RETURN T_IDENT T_COL_LEFT T_INT T_CHA_RIGHT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 326
+
+
+Estado 318
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico else
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . T_CHA_LEFT escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . T_CHA_LEFT escopo T_CHA_RIGHT else
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+    T_CHA_LEFT  deslocar, e ir ao estado 330
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 331
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 319
+
+  101 repeticao_label: T_IDENT T_DOIS_PONTOS T_INT .
+
+    $padrão  reduzir usando a regra 101 (repeticao_label)
+
+
+Estado 320
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT  deslocar, e ir ao estado 337
+
+
+Estado 321
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_VIRGULA  deslocar, e ir ao estado 338
+
+
+Estado 322
+
+  119 saida: T_PRINT T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 339
+
+
+Estado 323
+
+  118 saida: T_PRINT $@5 argumentos_print $@6 T_END_LINE .
+
+    $padrão  reduzir usando a regra 118 (saida)
+
+
+Estado 324
+
+  114 entrada: T_READ T_IDENT T_COL_LEFT T_INT T_COL_RIGHT . T_END_LINE
+
+    T_END_LINE  deslocar, e ir ao estado 340
+
+
+Estado 325
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+    T_CHA_LEFT  deslocar, e ir ao estado 341
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 342
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 326
+
+   46 retorno: T_RETURN T_IDENT T_COL_LEFT T_INT T_CHA_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 46 (retorno)
+
+
+Estado 327
+
+  130 operacao_inteira: T_IDENT . T_PLUS T_IDENT
+  133                 | T_IDENT . T_PLUS T_INT
+  136                 | T_IDENT . T_MINUS operacao_inteira
+  137                 | T_IDENT . T_MINUS T_IDENT
+  140                 | T_IDENT . T_MULTIPLY operacao_inteira
+  141                 | T_IDENT . T_MULTIPLY T_IDENT
+  161 operacao_logica: T_IDENT . T_OR operacao_logica
+  164                | T_IDENT . T_MORE operacao_logica
+  165                | T_IDENT . T_MORE T_INT
+  167                | T_IDENT . T_LESS operacao_logica
+  168                | T_IDENT . T_LESS T_INT
+  170                | T_IDENT . T_EQQ operacao_logica
+  171                | T_IDENT . T_EQQ T_INT
+  172 operacao_string: T_IDENT . T_APPEND T_LITERAL
+
+    T_PLUS      deslocar, e ir ao estado 67
+    T_MINUS     deslocar, e ir ao estado 68
+    T_MULTIPLY  deslocar, e ir ao estado 69
+    T_APPEND    deslocar, e ir ao estado 70
+    T_EQQ       deslocar, e ir ao estado 216
+    T_LESS      deslocar, e ir ao estado 217
+    T_MORE      deslocar, e ir ao estado 218
+    T_OR        deslocar, e ir ao estado 219
+
+
+Estado 328
+
+  104 selecao_uma_linha: T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+
+    T_PAR_LEFT  deslocar, e ir ao estado 343
+
+
+Estado 329
+
+   96 repeticao_uma_linha: T_FOR . T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   97                    | T_FOR . T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_PAR_LEFT  deslocar, e ir ao estado 344
+
+
+Estado 330
+
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT . escopo T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT . escopo T_CHA_RIGHT else
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 345
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 331
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico .
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico . else
+
+    T_ELSE  deslocar, e ir ao estado 346
+
+    $padrão  reduzir usando a regra 104 (selecao_uma_linha)
+
+    else  ir ao estado 347
+
+
+Estado 332
+
+   42 comando_unico: repeticao_uma_linha .
+
+    $padrão  reduzir usando a regra 42 (comando_unico)
+
+
+Estado 333
+
+   95 repeticao_uma_linha: while_init . T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_PAR_LEFT  deslocar, e ir ao estado 348
+
+
+Estado 334
+
+   41 comando_unico: selecao_uma_linha .
+
+    $padrão  reduzir usando a regra 41 (comando_unico)
+
+
+Estado 335
+
+   43 comando_unico: io .
+
+    $padrão  reduzir usando a regra 43 (comando_unico)
+
+
+Estado 336
+
+   44 comando_unico: operacao .
+
+    $padrão  reduzir usando a regra 44 (comando_unico)
+
+
+Estado 337
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_VIRGULA  deslocar, e ir ao estado 349
+
+
+Estado 338
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT  deslocar, e ir ao estado 350
+
+
+Estado 339
+
+  119 saida: T_PRINT T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 119 (saida)
+
+
+Estado 340
+
+  114 entrada: T_READ T_IDENT T_COL_LEFT T_INT T_COL_RIGHT T_END_LINE .
+
+    $padrão  reduzir usando a regra 114 (entrada)
+
+
+Estado 341
+
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT . escopo T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 351
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 342
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico .
+
+    $padrão  reduzir usando a regra 95 (repeticao_uma_linha)
+
+
+Estado 343
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica_label  ir ao estado 352
+    operacao_logica        ir ao estado 270
+
+
+Estado 344
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT . tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   97                    | T_FOR T_PAR_LEFT . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_IDENT        deslocar, e ir ao estado 271
+    T_STRING_TIPO  deslocar, e ir ao estado 25
+    T_BOOL_TIPO    deslocar, e ir ao estado 26
+    T_INT_TIPO     deslocar, e ir ao estado 27
+    T_REAL_TIPO    deslocar, e ir ao estado 28
+
+    tipo             ir ao estado 353
+    repeticao_label  ir ao estado 354
+
+
+Estado 345
+
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo . T_CHA_RIGHT
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo . T_CHA_RIGHT else
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+    T_CHA_RIGHT    deslocar, e ir ao estado 355
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 346
+
+  108 else: T_ELSE . T_DOIS_PONTOS comando_unico
+  110     | T_ELSE . T_DOIS_PONTOS $@4 T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 356
+
+
+Estado 347
+
+  105 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico else .
+
+    $padrão  reduzir usando a regra 105 (selecao_uma_linha)
+
+
+Estado 348
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT . operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_IDENT  deslocar, e ir ao estado 260
+    T_TRUE   deslocar, e ir ao estado 176
+    T_FALSE  deslocar, e ir ao estado 177
+
+    operacao_logica_label  ir ao estado 357
+    operacao_logica        ir ao estado 270
+
+
+Estado 349
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT  deslocar, e ir ao estado 358
+
+
+Estado 350
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 359
+
+
+Estado 351
+
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo . T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+    T_CHA_RIGHT    deslocar, e ir ao estado 360
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 352
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico else
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 361
+
+
+Estado 353
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo . repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_IDENT  deslocar, e ir ao estado 271
+
+    repeticao_label  ir ao estado 362
+
+
+Estado 354
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_VIRGULA  deslocar, e ir ao estado 363
+
+
+Estado 355
+
+  106 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT .
+  107                      | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT . else
+
+    T_ELSE  deslocar, e ir ao estado 346
+
+    $padrão  reduzir usando a regra 106 (selecao_varias_linhas)
+
+    else  ir ao estado 364
+
+
+Estado 356
+
+  108 else: T_ELSE T_DOIS_PONTOS . comando_unico
+  110     | T_ELSE T_DOIS_PONTOS . $@4 T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    T_CHA_LEFT  reduzir usando a regra 109 ($@4)
+    $padrão    reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 365
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    $@4                  ir ao estado 366
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 357
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 367
+
+
+Estado 358
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 368
+
+
+Estado 359
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 369
+
+
+Estado 360
+
+   98 repeticao_varias_linhas: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 98 (repeticao_varias_linhas)
+
+
+Estado 361
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico else
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 370
+
+
+Estado 362
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label . T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_VIRGULA  deslocar, e ir ao estado 371
+
+
+Estado 363
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_INT  deslocar, e ir ao estado 372
+
+
+Estado 364
+
+  107 selecao_varias_linhas: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT else .
+
+    $padrão  reduzir usando a regra 107 (selecao_varias_linhas)
+
+
+Estado 365
+
+  108 else: T_ELSE T_DOIS_PONTOS comando_unico .
+
+    $padrão  reduzir usando a regra 108 (else)
+
+
+Estado 366
+
+  110 else: T_ELSE T_DOIS_PONTOS $@4 . T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_CHA_LEFT  deslocar, e ir ao estado 373
+
+
+Estado 367
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 374
+
+
+Estado 368
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 375
+
+
+Estado 369
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+    T_CHA_LEFT  deslocar, e ir ao estado 376
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 377
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 370
+
+  104 selecao_uma_linha: T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+  105                  | T_IF T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico else
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 331
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 371
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA . T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_INT  deslocar, e ir ao estado 378
+
+
+Estado 372
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_VIRGULA  deslocar, e ir ao estado 379
+
+
+Estado 373
+
+  110 else: T_ELSE T_DOIS_PONTOS $@4 T_CHA_LEFT . escopo T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 380
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 374
+
+   95 repeticao_uma_linha: while_init T_PAR_LEFT operacao_logica_label T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 342
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 375
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . T_CHA_LEFT escopo T_CHA_RIGHT
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+    T_CHA_LEFT  deslocar, e ir ao estado 381
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 382
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 376
+
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT . escopo T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 383
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 377
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico .
+
+    $padrão  reduzir usando a regra 97 (repeticao_uma_linha)
+
+
+Estado 378
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT . T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_VIRGULA  deslocar, e ir ao estado 384
+
+
+Estado 379
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_INT  deslocar, e ir ao estado 385
+
+
+Estado 380
+
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+  110 else: T_ELSE T_DOIS_PONTOS $@4 T_CHA_LEFT escopo . T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+    T_CHA_RIGHT    deslocar, e ir ao estado 386
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 381
+
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT . escopo T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_RETURN       deslocar, e ir ao estado 182
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 188
+    escopo                   ir ao estado 387
+    retorno                  ir ao estado 190
+    identificadores          ir ao estado 191
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 192
+    repeticao_varias_linhas  ir ao estado 193
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 196
+    selecao_varias_linhas    ir ao estado 197
+    io                       ir ao estado 198
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 201
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 382
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico .
+
+    $padrão  reduzir usando a regra 96 (repeticao_uma_linha)
+
+
+Estado 383
+
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo . T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+    T_CHA_RIGHT    deslocar, e ir ao estado 388
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 384
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA . T_INT T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_INT  deslocar, e ir ao estado 389
+
+
+Estado 385
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 390
+
+
+Estado 386
+
+  110 else: T_ELSE T_DOIS_PONTOS $@4 T_CHA_LEFT escopo T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 110 (else)
+
+
+Estado 387
+
+   25 escopo: escopo . identificadores
+   27       | escopo . chamada_funcao
+   29       | escopo . repeticao_varias_linhas
+   31       | escopo . repeticao_uma_linha
+   33       | escopo . selecao_varias_linhas
+   35       | escopo . selecao_uma_linha
+   37       | escopo . io
+   39       | escopo . operacao
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo . T_CHA_RIGHT
+
+    T_INT          deslocar, e ir ao estado 172
+    T_REAL         deslocar, e ir ao estado 173
+    T_IDENT        deslocar, e ir ao estado 174
+    T_LITERAL      deslocar, e ir ao estado 175
+    T_TRUE         deslocar, e ir ao estado 176
+    T_FALSE        deslocar, e ir ao estado 177
+    T_STRING_TIPO  deslocar, e ir ao estado 178
+    T_BOOL_TIPO    deslocar, e ir ao estado 179
+    T_INT_TIPO     deslocar, e ir ao estado 180
+    T_REAL_TIPO    deslocar, e ir ao estado 181
+    T_IF           deslocar, e ir ao estado 183
+    T_FOR          deslocar, e ir ao estado 184
+    T_PRINT        deslocar, e ir ao estado 185
+    T_READ         deslocar, e ir ao estado 186
+    T_PAR_LEFT     deslocar, e ir ao estado 187
+    T_CHA_RIGHT    deslocar, e ir ao estado 391
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    chamada_funcao           ir ao estado 230
+    identificadores          ir ao estado 232
+    identificador_inteiro    ir ao estado 11
+    novo_inteiro             ir ao estado 12
+    identificador_float      ir ao estado 13
+    identificador_string     ir ao estado 14
+    identificador_bool       ir ao estado 15
+    repeticao_uma_linha      ir ao estado 233
+    repeticao_varias_linhas  ir ao estado 234
+    while_init               ir ao estado 194
+    $@3                      ir ao estado 195
+    selecao_uma_linha        ir ao estado 235
+    selecao_varias_linhas    ir ao estado 236
+    io                       ir ao estado 237
+    entrada                  ir ao estado 199
+    saida                    ir ao estado 200
+    operacao                 ir ao estado 238
+    operacao_inteira         ir ao estado 202
+    operacao_real            ir ao estado 203
+    operacao_logica          ir ao estado 204
+    operacao_string          ir ao estado 205
+
+
+Estado 388
+
+  100 repeticao_varias_linhas: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 100 (repeticao_varias_linhas)
+
+
+Estado 389
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT . T_PAR_RIGHT T_DOIS_PONTOS comando_unico
+
+    T_PAR_RIGHT  deslocar, e ir ao estado 392
+
+
+Estado 390
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 393
+
+
+Estado 391
+
+   99 repeticao_varias_linhas: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS T_CHA_LEFT escopo T_CHA_RIGHT .
+
+    $padrão  reduzir usando a regra 99 (repeticao_varias_linhas)
+
+
+Estado 392
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT . T_DOIS_PONTOS comando_unico
+
+    T_DOIS_PONTOS  deslocar, e ir ao estado 394
+
+
+Estado 393
+
+   97 repeticao_uma_linha: T_FOR T_PAR_LEFT repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 377
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205
+
+
+Estado 394
+
+   96 repeticao_uma_linha: T_FOR T_PAR_LEFT tipo repeticao_label T_VIRGULA T_INT T_VIRGULA T_INT T_PAR_RIGHT T_DOIS_PONTOS . comando_unico
+
+    T_INT       deslocar, e ir ao estado 172
+    T_REAL      deslocar, e ir ao estado 173
+    T_IDENT     deslocar, e ir ao estado 327
+    T_LITERAL   deslocar, e ir ao estado 175
+    T_TRUE      deslocar, e ir ao estado 176
+    T_FALSE     deslocar, e ir ao estado 177
+    T_IF        deslocar, e ir ao estado 328
+    T_FOR       deslocar, e ir ao estado 329
+    T_PRINT     deslocar, e ir ao estado 185
+    T_READ      deslocar, e ir ao estado 186
+    T_PAR_LEFT  deslocar, e ir ao estado 187
+
+    $padrão  reduzir usando a regra 102 ($@3)
+
+    comando_unico        ir ao estado 382
+    repeticao_uma_linha  ir ao estado 332
+    while_init           ir ao estado 333
+    $@3                  ir ao estado 195
+    selecao_uma_linha    ir ao estado 334
+    io                   ir ao estado 335
+    entrada              ir ao estado 199
+    saida                ir ao estado 200
+    operacao             ir ao estado 336
+    operacao_inteira     ir ao estado 202
+    operacao_real        ir ao estado 203
+    operacao_logica      ir ao estado 204
+    operacao_string      ir ao estado 205

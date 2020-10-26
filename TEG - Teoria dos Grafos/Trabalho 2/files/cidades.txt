@@ -1,0 +1,182 @@
+Santa Catarina
+.
+Joinville
+Jaraguá
+53
+.
+Joinville
+Balneário
+107
+.
+Joinville
+Barra Velha
+57
+.
+Joinville
+São Bento
+76
+.
+Joinville
+Blumenau
+105
+.
+Joinville
+Florianópolis
+188
+.
+Joinville
+Brusque
+126
+.
+Joinville
+Itajaí
+94
+.
+Joinville
+Guaramirim
+45
+.
+Jaraguá
+Balneário
+106
+.
+Jaraguá
+Barra Velha
+57
+.
+Jaraguá
+São Bento
+54
+.
+Jaraguá
+Blumenau
+65
+.
+Jaraguá
+Florianópolis
+129
+.
+Jaraguá
+Brusque
+125
+.
+Jaraguá
+Itajaí
+96
+.
+Jaraguá
+Guaramirim
+8
+.
+Balneário
+Barra Velha
+60
+.
+Balneário
+São Bento
+177
+.
+Balneário
+Blumenau
+64
+.
+Balneário
+Florianópolis
+80
+.
+Balneário
+Brusque
+42
+.
+Balneário
+Itajaí
+15
+.
+Balneário
+Guaramirim
+98
+.
+Barra Velha
+São Bento
+177
+.
+Barra Velha
+Blumenau
+71
+.
+Barra Velha
+Florianópolis
+134
+.
+Barra Velha
+Brusque
+71
+.
+Barra Velha
+Itajaí
+40
+.
+Barra Velha
+Guaramirim
+50
+.
+São Bento
+Blumenau
+117
+.
+São Bento
+Florianópolis
+258
+.
+São Bento
+Brusque
+57
+.
+São Bento
+Itajaí
+164
+.
+São Bento
+Guaramirim
+64
+.
+Blumenau
+Florianópolis
+160
+.
+Blumenau
+Brusque
+40
+.
+Blumenau
+Itajaí
+62
+.
+Blumenau
+Guaramirim
+58
+.
+Florianópolis
+Brusque
+101
+.
+Florianópolis
+Itajaí
+98
+.
+Florianópolis
+Guaramirim
+179
+.
+Brusque
+Itajaí
+35
+.
+Brusque
+Guaramirim
+118
+.
+Itajaí
+Guaramirim
+93
+.

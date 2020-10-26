@@ -1,0 +1,69 @@
+graph {
+	0
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	12
+	13
+	14
+	15
+	16
+	17
+	18
+	19
+	0 -- 1 [constraint=false]
+	0 -- 8 [constraint=false]
+	0 -- 9 [constraint=false]
+	0 -- 16 [constraint=false]
+	1 -- 8 [constraint=false]
+	1 -- 9 [constraint=false]
+	1 -- 16 [constraint=false]
+	2 -- 8 [constraint=false]
+	2 -- 13 [constraint=false]
+	2 -- 14 [constraint=false]
+	2 -- 17 [constraint=false]
+	3 -- 11 [constraint=false]
+	3 -- 13 [constraint=false]
+	3 -- 14 [constraint=false]
+	3 -- 17 [constraint=false]
+	4 -- 6 [constraint=false]
+	4 -- 10 [constraint=false]
+	4 -- 12 [constraint=false]
+	4 -- 15 [constraint=false]
+	5 -- 6 [constraint=false]
+	5 -- 10 [constraint=false]
+	5 -- 11 [constraint=false]
+	5 -- 12 [constraint=false]
+	6 -- 12 [constraint=false]
+	6 -- 15 [constraint=false]
+	7 -- 9 [constraint=false]
+	7 -- 16 [constraint=false]
+	7 -- 18 [constraint=false]
+	7 -- 19 [constraint=false]
+	8 -- 9 [constraint=false]
+	10 -- 12 [constraint=false]
+	10 -- 15 [constraint=false]
+	11 -- 14 [constraint=false]
+	11 -- 15 [constraint=false]
+	13 -- 14 [constraint=false]
+	13 -- 17 [constraint=false]
+	16 -- 19 [constraint=false]
+	17 -- 19 [constraint=false]
+	18 -- 19 [constraint=false]
+	0 [color="#825287" style=filled]
+	1 [color="#825287" style=filled]
+	8 [color="#825287" style=filled]
+	2 [color="#825287" style=filled]
+	13 [color="#825287" style=filled]
+	3 [color="#825287" style=filled]
+	11 [color="#825287" style=filled]
+	5 [color="#825287" style=filled]
+}

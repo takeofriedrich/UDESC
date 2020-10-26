@@ -1,0 +1,22 @@
+int main(){
+
+    int a;
+    int b;
+
+    print "Digite o valor de a:";
+    read a;
+
+    print "Digite o valor de b:";
+    read b;
+
+    print "Chamando a função que computa a soma de a e b...";
+    int x = inc(a,b);
+
+    print "O resultado eh:";
+    print x;
+    return 0;
+}
+
+int inc (int a , int b){
+    return a+b;
+}

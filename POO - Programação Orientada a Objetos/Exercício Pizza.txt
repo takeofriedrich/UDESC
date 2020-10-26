@@ -1,0 +1,147 @@
+class Main {
+  public static void main(String[] args) {
+    Sabor s1 = new Sabor(); // Cria um novo sabor
+    s1.nome = "4 queijos";
+    s1.doce = false;
+
+    Sabor s2 = new Sabor(); // Cria um novo sabor
+    s2.nome = "Marguerita"; // Dá o nome do novo sabor
+    s2.doce = false; // Indica que a pizza é salgada
+
+    Sabor s3 = new Sabor(); // Cria um novo sabor
+    s3.nome = "Prestígio"; // Dá o nome do novo sabor
+    s3.doce = true; // Indica que a pizza é doce
+
+    Sabor s4 = new Sabor(); // Cria um novo sabor 
+    s4.nome = "Brigadeiro";  // Dá o nome do novo sabor
+    s4.doce = true; // Indica que a pizza é doce
+
+    Sabor s5 = new Sabor(); // Cria um novo sabor
+    s5.nome = "Calabresa";  // Dá o nome do novo sabor
+    s5.doce = false; // Indica que a pizza é salgada
+
+    Sabor s6 = new Sabor(); // Cria um novo sabor
+    s6.nome = "Portuguesa";  // Dá o nome do novo sabor
+    s6.doce = false; // Indica que a pizza é salgada
+
+    Pizza pA = new Pizza(); // Cria uma nova pizza
+    pA.sabor1 = s1; // Define o sabor 1 do combo
+    pA.sabor2 = s2; // Define o sabor 2 do combo
+    pA.preco = 20.20; // Define o preço da pizza
+
+    Pizza pB = new Pizza(); // Cria uma nova pizza
+    pB.sabor1 = s1; // Define o sabor 1 do combo
+    pB.sabor2 = s5; // Define o sabor 2 do combo
+    pB.preco = 20.20; // Define o preço da pizza
+
+    Pizza pC = new Pizza(); // Cria uma nova pizza
+    pC.sabor1 = s1; // Define o sabor 1 do combo
+    pC.sabor2 = s6; // Define o sabor 2 do combo
+    pC.preco = 20.20; // Define o preço da pizza
+
+    Bebida b1 = new Bebida(); // Cria uma nova bebida
+    b1.nome = "Coca cola"; // Define o nome da bebida
+    b1.volume = 120; // Define o volume da bebida
+    b1.preco = 5.0; // Define o preço da bebida
+
+    Bebida b2 = new Bebida(); // Cria uma nova bebida
+    b2.nome = "Soda"; // Define o nome da bebida
+    b2.volume = 120; // Define o volume da bebida
+    b2.preco = 4.5; // Define o preço da bebida
+
+    Bebida b3 = new Bebida(); // Cria uma nova bebida
+    b3.nome = "Guaraná"; // Define o nome da bebida
+    b3.volume = 120; // Define o volume da bebida
+    b3.preco = 4.75; // Define o preço da bebida
+
+    Combo combo1 = new Combo(); // Cria um novo combo
+    combo1.pizza = pA; // Define a pizza do combo
+    combo1.bebida = b1; // Define a bebida do combo
+
+    Combo combo2 = new Combo(); // Cria um novo combo
+    combo2.pizza = pB; // Define a pizza do combo
+    combo2.bebida = b2; // Define a bebida do combo
+
+    Combo combo3 = new Combo(); // Cria um novo combo
+    combo3.pizza = pC; // Define a pizza do combo
+    combo3.bebida = b3; // Define a bebida do combo
+
+    double precoDoCombo1 = combo1.pizza.preco + combo1.bebida.preco; // Calcula o valor do combo 1;
+    double precoDoCombo2 = combo2.pizza.preco + combo2.bebida.preco; // Calcula o valor do combo 2;
+    double precoDoCombo3 = combo3.pizza.preco + combo3.bebida.preco; // Calcula o valor do combo 3;
+
+    // As linhas a seguir imprimem os dados dos três combos disponíveis na seguinte identação:
+
+    //------------------------------
+    //
+    // Combo:
+    //
+    // Sabores:
+    // -sabor1
+    // -sabor2
+    //
+    // Bebida:
+    // -bebida do combo | volume da bebida
+    //
+    // Preco: em reais
+    //
+    //------------------------------
+
+    System.out.println("------------------------------\n");
+
+      System.out.println(">>> Combo 1: \n");
+      System.out.println("Sabores:");
+      System.out.println("-"+combo1.pizza.sabor1.nome);
+      System.out.println("-"+combo1.pizza.sabor2.nome);
+      System.out.println("\nBebida:");
+      System.out.println("-"+combo1.bebida.nome+" | "+combo1.bebida.volume+" ml\n");
+      System.out.println("Preco: "+precoDoCombo1+" reais\n");
+      System.out.println("------------------------------\n");
+
+      System.out.println(">>> Combo 2: \n");
+      System.out.println("Sabores:");
+      System.out.println("-"+combo2.pizza.sabor1.nome);
+      System.out.println("-"+combo2.pizza.sabor2.nome);
+      System.out.println("\nBebida:");
+      System.out.println("-"+combo2.bebida.nome+" | "+combo2.bebida.volume+" ml\n");
+      System.out.println("Preco: "+precoDoCombo2+" reais\n");
+      System.out.println("------------------------------\n");
+
+      System.out.println(">>> Combo 3: \n");
+      System.out.println("Sabores:");
+      System.out.println("-"+combo3.pizza.sabor1.nome);
+      System.out.println("-"+combo3.pizza.sabor2.nome);
+      System.out.println("\nBebida:");
+      System.out.println("-"+combo3.bebida.nome+" | "+combo3.bebida.volume+" ml\n");
+      System.out.println("Preco: "+precoDoCombo3+" reais\n");
+      System.out.println("------------------------------\n");
+
+
+  }
+}
+
+// Definição das classes abaixo
+
+class Pizza{
+  Sabor sabor1;
+  Sabor sabor2;
+  double preco;
+}
+
+class Sabor{
+  boolean doce;
+  String nome;
+}
+
+class Bebida{
+  String nome;
+  int volume;
+  double preco;
+  boolean alcool; // Define se a bebida é alcoolica ou não
+}
+
+class Combo{
+  String nome;
+  Pizza pizza;
+  Bebida bebida;
+}

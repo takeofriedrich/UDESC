@@ -1,0 +1,14 @@
+int main(){
+
+    int i = 10;
+    
+    if (i<50): 
+    {
+        print "O valor eh menor que 50";
+        
+    }else:{
+        print "O valor eh maior ou igual a 50 ";
+    }
+    
+    return 0;
+}

@@ -1,0 +1,7 @@
+int main(){
+    print "Imprimindo os valores de 1 a 9, com passo 1:";
+    for (g:1,10,1):{
+        print g;
+    }
+    return 0;
+}

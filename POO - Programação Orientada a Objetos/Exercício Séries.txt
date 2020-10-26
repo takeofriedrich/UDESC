@@ -1,0 +1,165 @@
+// 1) Comente o que faz cada linha do programa.
+// 2) a.personagens = new Personagem[3]; descubra o que faz exatamente esta linha.
+// Ela cria um array de personagens dentro do objeto "a", no atributo personagem, ou seja, em vez de ela criar um personagem somente, ela cria tipo uma "lista" de personagens no objeto "a"
+
+// 3) Da forma como está, quantos personagens cabem em um seriado? faca com que seja possível colocar até 10 personagens
+// Da forma como está, cabem apenas 3 personagens 
+
+// 4) O que acontece se colocarmos as linhas 23-28 ante da linha 14? Descreva, com suas palavras o problema.
+// O objeto "a" do tipo Seriado seria criado e o seu atributo titulo seria "Game of Thrones", uma array de objetos do tipo personagens seria criado para o objeto "a", porém, não haveria como atribuir os valores contidos em "p","z" e "e", pois eles são criados apenas a partir da linha 14
+
+// 5) Faca com que Daenerys seja o primeiro nome a aparecer na tela.
+
+// 6) Adicione ano de lancamento ao seriado.
+// 7) Crie mais um seriado a sua escolha.
+// 8) Faca com que uma personagem tenha sua atriz ou ator e este tenha nome e sobrenome.
+// 9) Mostre na tela infos dos seriados cadastrados.
+
+class Main {
+  public static void main(String[] args) {
+
+      Personagem p = new Personagem(); // Cria um objeto da classe Personagem chamado "p"
+      p.nome = "Tyrion Lannister"; // Atribui ao atributo nome do objeto "p" um valor
+
+      Personagem z = new Personagem(); // Cria um objeto da classe Personagem chamado "z"
+      z.nome = "Daenerys Targaryen"; // Atribui ao atributo nome do objeto "z" um valor
+
+      Personagem e = new Personagem(); // Cria um objeto da classe Personagem chamado "e"
+      e.nome = "Arya Stark"; // Atribui ao atributo nome do objeto "e" um valor
+
+      Seriado a = new Seriado(); // Cria um objeto da classe Seriado chamado "a"
+      a.titulo = "Game of Thrones"; // Atribui ao atributo titulo do objeto "a" um valor
+      a.personagens = new Personagem[3]; // Cria um array da classe Personagens dentro do objeto "a" de tamanho 3
+
+      // Questão 3
+
+      // Modifica o tamanho do array de 3 para 10
+      a.personagens = new Personagem[10]; 
+      // Cria um personagem chamado vazio
+      Personagem vazio = new Personagem();
+      vazio.nome = "Sem nome";
+
+      // Para cada posição do array onde ainda não existe um nome (no caso apartir da 3ª posição) atribui "sem nome" ao personagem
+      for(int i=3;i<10;i++){
+        a.personagens[i] = vazio;
+      }
+
+      a.personagens[0] = p; // Atribui ao atributo personagem do objeto "a" na posicao 0 um valor
+      a.personagens[1] = z; // Atribui ao atributo personagem do objeto "a" na posicao 1 um valor
+      a.personagens[2] = e; // Atribui ao atributo personagem do objeto "a" na posicao 2 um valor
+
+      //   Questão 5
+
+      //>>Personagem auxiliar = new Personagem();
+      //>>auxiliar.nome = p.nome;
+
+      //>>a.personagens[0] = z;
+      //>>a.personagens[1] = auxiliar;
+
+      // Fim questão 5;
+
+      //>>System.out.println(a.titulo); 
+      // Printa na tela o atributo titulo do objeto "a"
+
+      //>>for(int i =0;i<a.personagens.length;i++){ 
+      // Cria um laço de repetição que percorre todas as posições do array, indo de 0 até o ultimo elemento
+
+      //>>  System.out.println("- "+a.personagens[i].nome); 
+      // Printa na tela todos os elementos do array de atributo personagem do objeta "a"
+      //>>}
+
+      // Questão 7
+
+      // Cria o objeto Seriado "b" e atribui os valores a ele
+
+      Seriado b = new Seriado();
+      b.titulo = "Daredevil";
+
+      Personagem p1 = new Personagem();
+      p1.nome = "Matt Murdock";
+
+      Personagem p2 = new Personagem();
+      p2.nome = "Karen Page";
+
+      Personagem p3 = new Personagem();
+      p3.nome = "Foggy Nelson";
+
+      b.personagens = new Personagem[3];
+      
+      b.personagens[0] = p1;
+      b.personagens[1] = p2;
+      b.personagens[2] = p3;
+
+      b.anoLancamento = 2015;
+
+      //  System.out.println(b.titulo); // Printa na tela o atributo titulo do objeto "a"
+      //for(int i =0;i<a.personagens.length;i++){ // Cria um laço de repetição que percorre todas as posições do array, indo de 0 até o ultimo elemento
+      //  System.out.println("- "+b.personagens[i].nome); // Printa na tela todos os elementos do array de atributo personagem do objeta "a"
+      //}
+
+      //  Questão 8:
+
+      // Adiciona o nome dos Atores e os seus respectivos sexos
+
+      p1.ator = "Charlie Cox";
+      p1.sexoMasculino = true;
+
+      p2.ator = "Debora Ann Woll";
+      p2.sexoMasculino = false;
+
+      p3.ator = "Elden Henson";
+      p3.sexoMasculino = true;
+
+      p.ator = "Peter Dinklage";
+      p.sexoMasculino = true;
+
+      z.ator = "Emilia Clarke";
+      z.sexoMasculino = false;
+
+      e.ator = "Maisie Willians";
+      e.sexoMasculino = false;
+
+      a.anoLancamento = 2011;
+
+      // Questão 9:
+
+      // Imprime as informações relacionadas aos seriados
+
+      System.out.println("\n\n>>> "+a.titulo+" - "+a.anoLancamento+":\n");
+      for(int i =0;i<3;i++){
+
+        if(a.personagens[i].sexoMasculino == true){
+          System.out.println("- "+a.personagens[i].nome+" \nAtor: "+a.personagens[i].ator);
+        }else{
+          System.out.println("- "+a.personagens[i].nome+" \nAtriz: "+a.personagens[i].ator);
+        }
+
+        System.out.println();
+      }
+
+      System.out.println("\n\n>>> "+b.titulo+" - "+b.anoLancamento+":\n");
+      for(int i =0;i<3;i++){
+
+        if(b.personagens[i].sexoMasculino == true){
+          System.out.println("- "+b.personagens[i].nome+" \nAtor: "+b.personagens[i].ator);
+        }else{
+          System.out.println("- "+b.personagens[i].nome+" \nAtriz: "+b.personagens[i].ator);
+        }
+
+        System.out.println();
+      }
+
+  }
+}
+
+class Seriado{
+  String titulo; 
+  Personagem[] personagens; // Declara um array da classe "Personagem"
+  int anoLancamento; // Questão 6
+}
+
+class Personagem{
+  String nome; // Nome do Personagem
+  String ator; // Nome do Ator que interpreta o personagem
+  boolean sexoMasculino; // Condição para imprimir atriz ou ator no console
+}

@@ -1,0 +1,13 @@
+int main(){
+
+    int i = 1; 
+    print "Digite um valor maior que 9: (a funcao vai ficar repetindo ate que isso aconteça)";
+
+    while (i<10):{
+        read i;
+        print i;
+    }
+
+    return 0;
+    
+}

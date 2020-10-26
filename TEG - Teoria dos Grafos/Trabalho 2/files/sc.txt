@@ -1,0 +1,13 @@
+CIDADES       | JOINVILLE | JARAGUÁ | BALNEÁRIO | BARRA VELHA | SÃO BENTO | BLUMENAU | FLORIANÓPOLIS | BRUSQUE | ITAJAÍ | GUARAMIRIM |
+JOINVILLE     |      0    |  53KM   |   107KM   |     57KM    |    76KM   |  105KM   |     188KM     |  126KM  |  94KM  |    45KM    |
+JARAGUÁ       |    53KM   |    0    |   106KM   |     60KM    |    54KM   |   65KM   |     129KM     |  125KM  |  96KM  |     8KM    |   
+BALNEÁRIO     |   107KM   |  106KM  |     0     |     60KM    |   177KM   |   64KM   |      80KM     |   42KM  |  15KM  |    98KM    |
+BARRA VELHA   |    57KM   |   60KM  |    60KM   |      0      |   117KM   |   71KM   |     134KM     |   71KM  |  40KM  |    50KM    |
+SÃO BENTO     |    76KM   |   54KM  |   177KM   |    117KM    |     0     |  117KM   |     258KM     |   57KM  | 164KM  |    64KM    |
+BLUMENAU      |   105KM   |   64KM  |    64KM   |     71KM    |    82KM   |    0     |     160KM     |   40KM  |  62KM  |    58KM    |
+FLORIANÓPOLIS |   188KM   |  129KM  |    80KM   |    134KM    |   258KM   |  160KM   |       0       |  101KM  |  98KM  |   179KM    |
+BRUSQUE       |   126KM   |  125KM  |    42KM   |     71KM    |    57KM   |   40KM   |     101KM     |    0    |  35KM  |   118KM    |
+ITAJAÍ        |    94KM   |   96KM  |    15KM   |     40KM    |   164KM   |   62KM   |      98KM     |   35KM  |    0   |    93KM    |
+GUARAMIRIM    |    45KM   |    8KM  |    98KM   |     50KM    |    64KM   |   58KM   |     179KM     |  118KM  |  93KM  |      0     |
+
+

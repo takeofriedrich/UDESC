@@ -1,0 +1,157 @@
+class Main {
+  public static void main(String[] args) {
+
+  Filme[] topFilmes = new Filme[20];
+
+  for(int i=0;i<20;i++){
+    topFilmes[i] = new Filme();
+  }
+  
+  
+  topFilmes[0].titulo = "Sempre ao seu lado";
+  topFilmes[0].diretor = "Lasse Hallstrom";
+  topFilmes[0].duracao = 93;
+  topFilmes[0].anoEstreia = 2009;
+  topFilmes[0].classificacao = 10;
+
+  topFilmes[1].titulo = "Batman The Dark Knight";
+  topFilmes[1].diretor = "Christopher Nolan";
+  topFilmes[1].duracao = 152;
+  topFilmes[1].anoEstreia = 2008;
+  topFilmes[1].classificacao = 10;
+
+  topFilmes[2].titulo = "Vingadores Guerra Infinita";
+  topFilmes[2].diretor = "Irmaos Russo";
+  topFilmes[2].duracao = 160;
+  topFilmes[2].anoEstreia = 2018;
+  topFilmes[2].classificacao = 9;
+
+  topFilmes[3].titulo = "Aquaman";
+  topFilmes[3].diretor = "James Wan";
+  topFilmes[3].duracao = 142;
+  topFilmes[3].anoEstreia = 2018;
+  topFilmes[3].classificacao = 9;
+
+  topFilmes[4].titulo = "Thor Ragnarok";
+  topFilmes[4].diretor = "Taika Waititi";
+  topFilmes[4].duracao = 130;
+  topFilmes[4].anoEstreia = 2017;
+  topFilmes[4].classificacao = 9;
+
+  topFilmes[5].titulo = "10 coisas que eu odeio em você";
+  topFilmes[5].diretor = "Gil Junger";
+  topFilmes[5].duracao = 97;
+  topFilmes[5].anoEstreia = 1999;
+  topFilmes[5].classificacao = 9;
+
+  topFilmes[6].titulo = "Interestelar";
+  topFilmes[6].diretor = "Christopher Nolar";
+  topFilmes[6].duracao =169 ;
+  topFilmes[6].anoEstreia = 2014;
+  topFilmes[6].classificacao = 8;
+
+  topFilmes[7].titulo = "Bohemian Rhapsody";
+  topFilmes[7].diretor = "Bryan Singer";
+  topFilmes[7].duracao = 134;
+  topFilmes[7].anoEstreia = 2018;
+  topFilmes[7].classificacao = 8;
+
+  topFilmes[8].titulo = "Deadpool";
+  topFilmes[8].diretor = "Tim Miller";
+  topFilmes[8].duracao = 108;
+  topFilmes[8].anoEstreia = 2016;
+  topFilmes[8].classificacao = 8;
+
+  topFilmes[9].titulo = "Logan";
+  topFilmes[9].diretor = "James Mangold";
+  topFilmes[9].duracao = 137;
+  topFilmes[9].anoEstreia = 2017;
+  topFilmes[9].classificacao = 8;
+
+  topFilmes[10].titulo = "Tropa de Elite";
+  topFilmes[10].diretor = "José Padilha";
+  topFilmes[10].duracao = 115;
+  topFilmes[10].anoEstreia = 2007;
+  topFilmes[10].classificacao = 7;
+
+  topFilmes[11].titulo = "Capitão America: O primeiro vingador";
+  topFilmes[11].diretor = "Joe Johnson";
+  topFilmes[11].duracao = 115;
+  topFilmes[11].anoEstreia = 2011;
+  topFilmes[11].classificacao = 7;
+
+  topFilmes[12].titulo = "Pantera Negra";
+  topFilmes[12].diretor = "Ryan Coogler";
+  topFilmes[12].duracao = 134;
+  topFilmes[12].anoEstreia = 2018;
+  topFilmes[12].classificacao = 7;
+
+  topFilmes[13].titulo = "Doutor Estranho";
+  topFilmes[13].diretor = "Scott Derrickson";
+  topFilmes[13].duracao = 115;
+  topFilmes[13].anoEstreia = 2016;
+  topFilmes[13].classificacao = 7;
+
+  topFilmes[14].titulo = "Marley e Eu";
+  topFilmes[14].diretor = "David Frankel";
+  topFilmes[14].duracao = 115;
+  topFilmes[14].anoEstreia = 2008;
+  topFilmes[14].classificacao = 7;
+
+  topFilmes[15].titulo = "o menino do pijama listrado";
+  topFilmes[15].diretor = "Mark Herman";
+  topFilmes[15].duracao = 94;
+  topFilmes[15].anoEstreia = 2008;
+  topFilmes[15].classificacao = 7;
+
+  topFilmes[16].titulo = "A culpa é das estrelas";
+  topFilmes[16].diretor = "josh Boone";
+  topFilmes[16].duracao = 126;
+  topFilmes[16].anoEstreia = 2014;
+  topFilmes[16].classificacao = 7;
+
+  topFilmes[17].titulo = "Rei leão";
+  topFilmes[17].diretor = "Roger Allers e Rob minkoof";
+  topFilmes[17].duracao = 88;
+  topFilmes[17].anoEstreia = 1994;
+  topFilmes[17].classificacao = 7;
+
+  topFilmes[18].titulo = "O jogo da imitaçao";
+  topFilmes[18].diretor = "Morten tyldum";
+  topFilmes[18].duracao = 114;
+  topFilmes[18].anoEstreia = 2014;
+  topFilmes[18].classificacao = 7;
+
+  topFilmes[19].titulo = "De volta para o futuro";
+  topFilmes[19].diretor = "Robert Zemeckis";
+  topFilmes[19].duracao = 116;
+  topFilmes[19].anoEstreia = 1985;
+  topFilmes[19].classificacao = 6;
+
+  
+
+  for(int i=0;i<20;i++){
+
+    System.out.println("Top "+i);
+    System.out.println("Titulo: "+topFilmes[i].titulo);
+    System.out.println("Diretor: "+topFilmes[i].diretor);
+    System.out.println("Duracao: "+topFilmes[i].duracao+" minutos");
+    System.out.println("Ano de estreia: "+topFilmes[i].anoEstreia);
+    System.out.println("Classificacao: "+topFilmes[i].classificacao+" estrelas");
+    System.out.println();
+
+  }
+  }
+
+}
+
+
+class Filme{
+
+  String titulo;
+  String diretor;
+  int duracao;
+  int anoEstreia;
+  int classificacao;
+
+}

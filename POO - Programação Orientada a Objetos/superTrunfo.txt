@@ -1,0 +1,801 @@
+package trunfo2Package;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Random;
+
+// Vinícius Takeo Friedrich Kuwaki
+// POO TADS 2019.1
+
+public class superTrunfo2 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Jogo jogo1 = new Jogo();
+		jogo1.novoJogo();
+
+	}
+
+}
+
+class Atributo{
+	double valor;
+	String nome;
+}
+
+class Carta{
+
+	int id;
+	String nome;
+	Grupo grupoCarta = new Grupo();
+	boolean superTrunfo;
+	Atributo atributosCarta[] = new Atributo[5];
+
+	void ImprimeCarta() {
+		System.out.println("-----------------------------------------------------------");
+		System.out.println(nome);
+		if(superTrunfo == true) {
+			System.out.println("SUPER TRUNFO");
+		}
+		System.out.println("Grupo "+grupoCarta.numero+grupoCarta.letra);
+		for(int i=0;i<5;i++) {
+			System.out.println(atributosCarta[i].nome+": "+atributosCarta[i].valor);
+		}
+		System.out.println("-----------------------------------------------------------");
+	}
+
+
+}
+
+class Grupo{
+	int numero;
+	char letra;
+}
+
+class Jogador{
+
+	String nome;
+	ArrayList<Carta> maoJogador = new ArrayList<Carta>();
+	boolean computador;
+	boolean possuiSuperTrunfo;
+
+	void defineTipoJogador(boolean type) {
+		computador = type;
+	}
+
+	void defineNomeJogador(String name) {
+		nome = name;
+	}
+
+	int numeroCartas() {
+		return maoJogador.size();
+	}
+
+	void desceCarta() {
+		recebeCarta(perdeCarta());
+	}
+
+	void imprimeCartaMao(){
+		maoJogador.get(maoJogador.size()-1).ImprimeCarta();
+	}
+
+	boolean semCartas() {
+		if (maoJogador.size() == 0 ) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	void recebeCarta(Carta cartaNova) {
+		maoJogador.add(0,cartaNova);
+	}
+
+	Carta perdeCarta() {
+		Carta cartaRemovida = new Carta();
+		cartaRemovida = maoJogador.get(maoJogador.size() - 1);
+		maoJogador.remove(maoJogador.size()-1);
+		return cartaRemovida;
+	}
+
+	Atributo escolheAtributo() {
+
+		int posicaoAtributo = 0;
+
+
+		if(computador == true) {
+			double atributoPeso = maoJogador.get(maoJogador.size()-1).atributosCarta[1].valor;
+			double atributoMaisAlto = maoJogador.get(maoJogador.size()-1).atributosCarta[0].valor;
+
+			for(int i=2;i<5;i++) {
+				if(maoJogador.get(maoJogador.size()-1).atributosCarta[i].valor > atributoMaisAlto) {
+					atributoMaisAlto = maoJogador.get(maoJogador.size()-1).atributosCarta[i].valor;
+					posicaoAtributo = i;
+					// ARMAZENA O ATRIBUTO MAIS ALTO DA CARTA
+				}
+
+			}
+
+			if((atributoPeso>50) || (atributoMaisAlto < 3)) {
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(nome+" escolheu:");
+				System.out.println(maoJogador.get(maoJogador.size()-1).atributosCarta[1].nome);
+				System.out.println("-----------------------------------------------------------");
+				return maoJogador.get(maoJogador.size()-1).atributosCarta[1];
+			}else {
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(nome+" escolheu:");
+				System.out.println(maoJogador.get(maoJogador.size()-1).atributosCarta[posicaoAtributo].nome);
+				System.out.println("-----------------------------------------------------------");
+				return maoJogador.get(maoJogador.size()-1).atributosCarta[posicaoAtributo];
+			}
+		}else {
+
+			int valorScan = 0;
+
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tSua carta:");
+			System.out.println("-----------------------------------------------------------");
+			maoJogador.get(maoJogador.size()-1).ImprimeCarta();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("Digite o numero do atributo que voce deseja escolher [1,5]:");
+			System.out.println("-----------------------------------------------------------");
+			Scanner w = new Scanner(System.in);
+			valorScan = w.nextInt();
+			System.out.println(valorScan);
+			while(valorScan<1 || valorScan>5) {
+				valorScan = w.nextInt();
+				System.out.println(valorScan);
+				if(valorScan>=1 && valorScan<=5) {
+					w.close();
+				}
+			}
+			valorScan--;
+			System.out.println("-----------------------------------------------------------");
+			System.out.println(nome+" escolheu:");
+			System.out.println(maoJogador.get(maoJogador.size()-1).atributosCarta[valorScan].nome);
+			System.out.println("-----------------------------------------------------------");
+
+			return maoJogador.get(maoJogador.size()-1).atributosCarta[valorScan];
+		}
+
+	}
+
+	boolean possuiSuperTrunfoTopo(){
+		if(maoJogador.get(maoJogador.size()-1).superTrunfo == true) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	boolean grupoA() {
+		if(maoJogador.get(maoJogador.size()-1).grupoCarta.letra == 'A') {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	boolean superTrunfoMao(){
+		if(maoJogador.get(maoJogador.size()-1).superTrunfo) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	void imprimeMao() {
+		System.out.println("-----------------------------------------------------------");
+		System.out.println(nome);
+		for(int i=0;i<maoJogador.size();i++) {
+			System.out.println(maoJogador.get(i).id);
+		}
+		System.out.println("-----------------------------------------------------------");
+	}
+
+	void desistir() {
+		maoJogador.clear();
+	}
+}
+
+class Mesa{
+
+	ArrayList<Carta> pilhaMesa = new ArrayList<Carta>();
+	ArrayList<Carta> cartasJogo = new ArrayList<Carta>();
+
+	boolean pilhaMesaVazia() {
+		if ( pilhaMesa.size() == 0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+
+
+	void AdicionaCarta(int id, String nome, boolean sT, char letraGrupo, int valorGrupo, double v1, double v2, double v3, double v4, double v5) {
+
+		Carta a6 = new Carta();
+		a6.id = id;
+		a6.nome = nome;
+		a6.superTrunfo = sT;
+		a6.grupoCarta.letra = letraGrupo;
+		a6.grupoCarta.numero = valorGrupo;
+		a6.atributosCarta[0] = new Atributo();
+		a6.atributosCarta[0].nome = "1 - Brincalhão";
+		a6.atributosCarta[1] = new Atributo();
+		a6.atributosCarta[1].nome = "2 - Peso";
+		a6.atributosCarta[2] = new Atributo();
+		a6.atributosCarta[2].nome = "3 - Agressividade";
+		a6.atributosCarta[3] = new Atributo();
+		a6.atributosCarta[3].nome = "4 - Agilidade";
+		a6.atributosCarta[4] = new Atributo();
+		a6.atributosCarta[4].nome = "5 - Obediência";
+		a6.atributosCarta[0].valor = v1;
+		a6.atributosCarta[1].valor = v2;
+		a6.atributosCarta[2].valor = v3;
+		a6.atributosCarta[3].valor = v4;
+		a6.atributosCarta[4].valor = v5;
+
+		cartasJogo.add(a6);
+	}
+
+
+	void jogadorPerdeMesaGanha(Jogador jogador) {
+		pilhaMesa.add(perdeCartaTopo(jogador.maoJogador));
+	}
+
+	void mesaPerdeJogadorGanha(Jogador jogador1) {
+		while(pilhaMesa.size()!=0) {
+			playerRecebeCarta(perdeCartaTopo(pilhaMesa), jogador1);
+		}
+	}
+
+	void playerRecebeCarta(Carta cartaNova, Jogador jogador) {
+		jogador.maoJogador.add(cartaNova);
+	}
+
+	Carta perdeCartaTopo(ArrayList<Carta> array) {
+		Carta cartaRemovida = new Carta();
+		cartaRemovida = array.get(array.size() - 1);
+		array.remove(array.size()-1);
+		return cartaRemovida;
+	}
+
+	void embaralhaCartas(int numeroCartas){
+		while(pilhaMesa.size()!= numeroCartas) {
+			Random gerador = new Random(System.currentTimeMillis());
+			int posicaoAleatoria = gerador.nextInt(numeroCartas-pilhaMesa.size());
+			Carta aux = new Carta();
+			aux = cartasJogo.get(posicaoAleatoria);
+			pilhaMesa.add(aux);
+			cartasJogo.remove(posicaoAleatoria);
+		}
+	}
+
+	void imprimePilhaMesa() {
+		System.out.println("-----------------------------------------------------------");
+		System.out.println("Pilha Mesa:");
+		for(int i=0;i<pilhaMesa.size();i++) {
+			System.out.println(pilhaMesa.get(i).id);
+		}
+		System.out.println("-----------------------------------------------------------");
+	}
+
+	void imprimeCartasJogo() {
+		System.out.println("-----------------------------------------------------------");
+		System.out.println("Cartas Jogo:");
+		for(int i=0;i<cartasJogo.size();i++) {
+			System.out.println(cartasJogo.get(i).id);
+		}
+		System.out.println("-----------------------------------------------------------");
+	}
+
+	void distribuiCartas(Jogador jogador1, Jogador jogador2) {
+
+		int numMetadeCartas = pilhaMesa.size()/2;
+
+		for(int i=0;i<numMetadeCartas;i++) {
+
+			Carta aux = new Carta();
+			aux = perdeCartaTopo(pilhaMesa);
+			if(aux.superTrunfo) {
+				jogador1.possuiSuperTrunfo = true;
+			}
+			playerRecebeCarta(aux,jogador1);
+
+		}
+		for(int i=0;i<numMetadeCartas;i++) {
+
+			Carta aux = new Carta();
+			aux = perdeCartaTopo(pilhaMesa);
+			if(aux.superTrunfo) {
+				jogador2.possuiSuperTrunfo = true;
+			}
+			playerRecebeCarta(aux,jogador2);
+
+		}
+	}
+
+	Jogador comparaAtributo(Jogador jogador1, Jogador jogador2, Atributo atributo) {
+
+		int posi=0;
+
+		for(int i=0;i<5;i++) {
+			if(atributo.nome == jogador1.maoJogador.get(jogador1.maoJogador.size()-1).atributosCarta[i].nome) {
+				posi = i;
+				break;
+			}
+		}
+
+		double jog1 = jogador1.maoJogador.get(jogador1.maoJogador.size()-1).atributosCarta[posi].valor;
+		double jog2 = jogador2.maoJogador.get(jogador2.maoJogador.size()-1).atributosCarta[posi].valor;
+
+		if(jog1 > jog2) {
+
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador1.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador1.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador2.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador2.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\t"+jogador1.nome+" ganhou ");
+			System.out.println("-----------------------------------------------------------");
+
+			return jogador1;
+		}else {
+			if(jog2 > jog1) {
+
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\tCarta do "+jogador1.nome);
+				System.out.println("-----------------------------------------------------------");
+				jogador1.imprimeCartaMao();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\tCarta do "+jogador2.nome);
+				System.out.println("-----------------------------------------------------------");
+				jogador2.imprimeCartaMao();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\t"+jogador2.nome+" ganhou ");
+				System.out.println("-----------------------------------------------------------");
+
+				return jogador2;
+			}else {
+
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\tCarta do "+jogador1.nome);
+				System.out.println("-----------------------------------------------------------");
+				jogador1.imprimeCartaMao();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\tCarta do "+jogador2.nome);
+				System.out.println("-----------------------------------------------------------");
+				jogador2.imprimeCartaMao();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("\tHouve empate ");
+				System.out.println("-----------------------------------------------------------");
+				jogadorPerdeMesaGanha(jogador1);
+				jogadorPerdeMesaGanha(jogador2);
+
+
+				return jogador2;
+			}
+		}
+
+	}
+
+	Jogador comparaGrupo(Jogador jogador1, Jogador jogador2) { // RETORNA O JOGADOR GANHADOR
+		if(jogador2.grupoA()) {
+
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador1.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador1.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador2.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador2.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println(jogador2.nome+" ganhou pois possuia carta do grupo A");
+			System.out.println("-----------------------------------------------------------");
+			return jogador2;
+		}else {
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador1.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador1.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("\tCarta do "+jogador2.nome);
+			System.out.println("-----------------------------------------------------------");
+			jogador2.imprimeCartaMao();
+			System.out.println("-----------------------------------------------------------");
+			System.out.println(jogador1.nome+" ganhou pois possuia superTrunfo");
+			System.out.println("-----------------------------------------------------------");
+			return jogador1;
+		}
+	}
+
+	Jogador jogadorInicial(Jogador jogador1, Jogador jogador2) {
+		if(jogador1.possuiSuperTrunfo) {
+			System.out.println("-----------------------------------------------------------");
+			System.out.println(jogador1.nome+" começa pois possui o Super Trunfo");
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("Digite 1 para CONFIRMAR");
+			System.out.println("-----------------------------------------------------------");
+
+			int ok=0;
+			Scanner w = new Scanner(System.in);
+			ok = w.nextInt();
+			while(ok!=1) {
+				ok = w.nextInt();
+				if(ok==1) {
+					w.close();
+				}
+			}
+
+			return jogador1;
+		}else {
+
+			if(jogador2.possuiSuperTrunfo) {
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogador2.nome+" começa pois possui o Super Trunfo");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONFIRMAR");
+				System.out.println("-----------------------------------------------------------");
+			}else {
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogador2.nome+" começa pois ninguém possui o Super Trunfo");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONFIRMAR");
+				System.out.println("-----------------------------------------------------------");
+			}
+
+
+
+			int ok=0;
+			Scanner w = new Scanner(System.in);
+			ok = w.nextInt();
+			while(ok!=1) {
+				ok = w.nextInt();
+				if(ok==1) {
+					w.close();
+				}
+			}
+
+			return jogador2;
+		}
+	}
+
+	Jogador retornaGanhador(Jogador jogadorVez, Jogador jogador2) {
+
+		Jogador aux = new Jogador();
+
+		if(jogadorVez.superTrunfoMao()) {
+			aux = comparaGrupo(jogadorVez, jogador2);
+			return aux;
+		}else {
+			if(jogador2.superTrunfoMao()) {
+				aux = comparaGrupo(jogador2,jogadorVez);
+				return aux;
+
+			}else {
+
+				Atributo atrAux;
+				atrAux = jogadorVez.escolheAtributo();
+				aux = comparaAtributo(jogadorVez,jogador2,atrAux);
+
+				return aux;
+			}
+		}
+	}
+
+	void turno(Jogador jogadorVez, Jogador jogador2) {
+
+		Jogador aux = new Jogador();
+
+		if(pilhaMesaVazia()==true) { // SE NAO HOUVE EMPATE NA PARTIDA ANTERIOR
+
+			aux = retornaGanhador(jogadorVez,jogador2);
+
+			if(aux == jogadorVez) {
+
+				// jogadorVez recebe as cartas
+				jogadorVez.recebeCarta(jogador2.perdeCarta());
+				jogadorVez.desceCarta();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogadorVez.nome+" possui "+jogadorVez.numeroCartas()+" cartas");
+				System.out.println(jogador2.nome+" possui "+jogador2.numeroCartas()+" cartas");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONFIRMAR");
+				System.out.println("Digite 2 para DESISTIR");
+				System.out.println("-----------------------------------------------------------");
+				int ok=0;
+				Scanner w = new Scanner(System.in);
+				ok = w.nextInt();
+				while(ok<1 || ok>2) {
+					ok = w.nextInt();
+					if(ok>=1 && ok<=2) {
+						w.close();
+					}
+				}
+
+				if(ok==2) {
+
+					if(jogadorVez.computador == true) {
+						jogador2.desistir();
+					}else {
+						jogadorVez.desistir();
+					}
+
+				}
+				System.out.println("-----------------------------------------------------------");
+
+				jogadorVez = jogador2;
+				jogador2 = aux;
+			}else {
+
+				// jogador2 recebe as cartas
+				jogador2.recebeCarta(jogadorVez.perdeCarta());
+				jogador2.desceCarta();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogadorVez.nome+" possui "+jogadorVez.numeroCartas()+" cartas");
+				System.out.println(jogador2.nome+" possui "+jogador2.numeroCartas()+" cartas");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONFIRMAR");
+				System.out.println("Digite 2 para DESISTIR");
+				System.out.println("-----------------------------------------------------------");
+				int ok=0;
+				Scanner w = new Scanner(System.in);
+				ok = w.nextInt();
+				while(ok<1 || ok>2) {
+					ok = w.nextInt();
+					if(ok>=1 && ok<=2) {
+						w.close();
+					}
+				}
+
+				if(ok==2) {
+
+					if(jogadorVez.computador == true) {
+						jogador2.desistir();
+					}else {
+						jogadorVez.desistir();
+					}
+
+				}
+				System.out.println("-----------------------------------------------------------");
+				jogador2 = jogadorVez;
+				jogadorVez = aux;
+
+			}
+		}else {
+			// SE HOUVE EMPATE NA PARTIDA ANTERIOR
+
+			aux = retornaGanhador(jogadorVez,jogador2);
+
+			if(aux == jogadorVez) {
+
+				// jogadorVez recebe as cartas
+				mesaPerdeJogadorGanha(jogadorVez);
+				jogadorVez.recebeCarta(jogador2.perdeCarta());
+				jogadorVez.desceCarta();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogadorVez.nome+" possui "+jogadorVez.numeroCartas()+" cartas");
+				System.out.println(jogador2.nome+" possui "+jogador2.numeroCartas()+" cartas");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONFIRMAR");
+				System.out.println("Digite 2 para DESISTIR");
+				System.out.println("-----------------------------------------------------------");
+				int ok=0;
+				Scanner w = new Scanner(System.in);
+				ok = w.nextInt();
+				while(ok<1 || ok>2) {
+					ok = w.nextInt();
+					if(ok>=1 && ok<=2) {
+						w.close();
+					}
+				}
+
+				if(ok==2) {
+
+					if(jogadorVez.computador == true) {
+						jogador2.desistir();
+					}else {
+						jogadorVez.desistir();
+					}
+
+				}
+				System.out.println("-----------------------------------------------------------");
+				jogadorVez = jogador2;
+				jogador2 = aux;
+			}else {
+
+				// jogador2 recebe as cartas
+				mesaPerdeJogadorGanha(jogador2);
+				jogador2.recebeCarta(jogadorVez.perdeCarta());
+				jogador2.desceCarta();
+				System.out.println("-----------------------------------------------------------");
+				System.out.println(jogadorVez.nome+" possui "+jogadorVez.numeroCartas()+" cartas");
+				System.out.println(jogador2.nome+" possui "+jogador2.numeroCartas()+" cartas");
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("Digite 1 para CONTINUAR");
+				System.out.println("Digite 2 para DESISTIR");
+				System.out.println("-----------------------------------------------------------");
+				int ok=0;
+				Scanner w = new Scanner(System.in);
+				ok = w.nextInt();
+				while(ok<1 || ok>2) {
+					ok = w.nextInt();
+					if(ok>=1 && ok<=2) {
+						w.close();
+					}
+				}
+
+				if(ok==2) {
+
+					if(jogadorVez.computador == true) {
+						jogador2.desistir();
+					}else {
+						jogadorVez.desistir();
+					}
+
+				}
+
+				System.out.println("-----------------------------------------------------------");
+				jogador2 = jogadorVez;
+				jogadorVez = aux;
+
+			}
+
+		}
+
+
+
+	}
+}
+
+class Jogo{
+
+	Jogador player1 = new Jogador();
+	Jogador player2 = new Jogador();
+
+	void defineNomePlayer(String nome) {
+
+		player1.defineNomeJogador(nome);
+		player1.defineTipoJogador(false);
+		player2.defineNomeJogador("Computador");
+		player2.defineTipoJogador(true);
+
+	}
+
+	void novoJogo() {
+
+	Mesa mesa = new Mesa();
+
+	System.out.println("-----------------------------------------------------------");
+	System.out.println("\tDigite seu nome:");
+	System.out.println("-----------------------------------------------------------");
+
+	String nome;
+	Scanner scannerNome = new Scanner(System.in);
+	nome = scannerNome.nextLine();
+	defineNomePlayer(nome);
+	while(nome == null) {
+		nome = scannerNome.nextLine();
+		if(nome!= null) {
+			scannerNome.close();
+		}
+	}
+
+
+	System.out.println("-----------------------------------------------------------");
+	System.out.println("\tDigite 1 para jogar com 16 cartas:");
+	System.out.println("\tDigite 2 para jogar com 32 cartas:");
+	System.out.println("-----------------------------------------------------------");
+
+	int numeroCartas=0;
+	Scanner w = new Scanner(System.in);
+	numeroCartas = w.nextInt();
+	while(numeroCartas<1 || numeroCartas>2) {
+		numeroCartas = w.nextInt();
+		if(numeroCartas>=1 && numeroCartas<=2) {
+			w.close();
+		}
+	}
+
+	if(numeroCartas==1) {
+		numeroCartas=16;
+	}else {
+		numeroCartas=32;
+	}
+
+	mesa.AdicionaCarta(1, "Pastor Alemão", false, 'D', 4, 7, 42, 8, 4, 10);
+	mesa.AdicionaCarta(2, "Akita", false, 'A', 5, 2, 50, 7, 2, 8);
+	mesa.AdicionaCarta(3, "Buldogue", false, 'C', 3, 7, 50, 4, 3, 2);
+	mesa.AdicionaCarta(4, "Bledington Terrie", false, 'B', 8, 4, 10.5, 2, 9, 8);
+	mesa.AdicionaCarta(5, "Chow Chow", false, 'B', 5, 1, 32.0, 10, 2, 1);
+	mesa.AdicionaCarta(6, "São Bernardo", false, 'D', 1, 1, 110, 6, 1, 3);
+	mesa.AdicionaCarta(7, "Labrador", false, 'A', 7, 8, 57, 3, 6, 9);
+	mesa.AdicionaCarta(8, "Afghan Hound", false, 'D', 3, 3, 25, 2, 4, 8);
+	mesa.AdicionaCarta(9, "Basset Hound", false, 'C', 6, 1, 27, 1, 1, 5);
+	mesa.AdicionaCarta(10, "Border Collie", false, 'A', 1, 6, 22, 2, 8, 9);
+	mesa.AdicionaCarta(11, "Poodle Toy", false, 'A', 2, 7, 5.5, 4, 7, 8);
+	mesa.AdicionaCarta(12, "Rottweiler", false, 'A', 4, 2, 50, 9, 2, 7);
+	mesa.AdicionaCarta(13, "Beagle", false, 'D', 8, 5, 13.5, 5, 9, 1);
+	mesa.AdicionaCarta(14, "Collie", false, 'B', 1, 5, 34, 2, 1, 9);
+	mesa.AdicionaCarta(15, "West Highland White", false, 'C', 8, 8, 6, 10, 10, 2);
+	mesa.AdicionaCarta(16, "Pug", false, 'C', 2, 5, 8, 5, 6, 2);
+	mesa.AdicionaCarta(17, "Dobermann", false, 'C', 4, 4, 40, 8, 4, 10);
+	mesa.AdicionaCarta(18, "Dogue Alemão", false, 'B', 6, 3, 70, 4, 2, 6);
+	mesa.AdicionaCarta(19, "Schnauzer Anão", false, 'A', 8, 10, 6, 8, 10, 7);
+	mesa.AdicionaCarta(20, "Dálmata", false, 'A', 6, 6, 58, 7, 6, 6);
+	mesa.AdicionaCarta(21, "Husky Siberiano", true, 'D', 5, 4, 27, 8, 6, 5);
+	mesa.AdicionaCarta(22, "Pit Bull", false, 'A', 3, 1, 27, 9, 8, 10);
+	mesa.AdicionaCarta(23, "Boxer", false, 'B', 4, 5, 28, 6, 4, 6);
+	mesa.AdicionaCarta(24, "Samoiedo", false, 'C', 5, 2, 26.5, 9, 3, 4);
+	mesa.AdicionaCarta(25, "Stafford Shire Terrier", false, 'B', 3, 3, 23, 8, 8, 7);
+	mesa.AdicionaCarta(26, "Cocker Spaniel Americano", false, 'C', 7, 6, 14, 3, 5, 7);
+	mesa.AdicionaCarta(27, "Golden Retriever", false, 'D', 7, 9, 34, 1, 4, 9);
+	mesa.AdicionaCarta(28, "Old English Sheepdog", false, 'C', 1, 3, 58, 6, 3, 3);
+	mesa.AdicionaCarta(29, "Sharpei", false, 'B', 2, 5, 21, 2, 3, 7);
+	mesa.AdicionaCarta(30, "Yorkshire", false, 'D', 2, 8, 3.5, 7, 9, 3);
+	mesa.AdicionaCarta(31, "Weimaraner", false, 'D', 6, 6, 23, 7, 7, 4);
+	mesa.AdicionaCarta(32, "Setter Irlandês Ruivo", false, 'B', 7, 10, 30, 2, 10, 3);
+
+	mesa.embaralhaCartas(numeroCartas);
+
+	mesa.distribuiCartas(player1, player2);
+
+	System.out.println("-----------------------------------------------------------");
+	System.out.println(player1.nome+" possui "+player1.numeroCartas()+" cartas");
+	System.out.println(player2.nome+" possui "+player2.numeroCartas()+" cartas");
+	System.out.println("-----------------------------------------------------------");
+	System.out.println("Digite 1 para CONTINUAR");
+	System.out.println("-----------------------------------------------------------");
+
+	int ok=0;
+	Scanner x = new Scanner(System.in);
+	ok = x.nextInt();
+
+	while(ok!=1) {
+		ok = x.nextInt();
+		if(ok==1) {
+			x.close();
+		}
+	}
+
+	Jogador aux = new Jogador();
+	aux = mesa.jogadorInicial(player1, player2);
+
+	if( aux == player2 ) {
+		aux = player1;
+		player1 = player2;
+		player2 = aux;
+	}
+
+	while(player1.semCartas() != true || player2.semCartas() != true) {
+		if(player1.semCartas()) {
+			System.out.println("-----------------------------------------------------------");
+			System.out.println("FIM DE JOGO");
+			System.out.println(player2.nome+" ganhou");
+			System.out.println("-----------------------------------------------------------");
+			break;
+		}else {
+			if(player2.semCartas()) {
+				System.out.println("-----------------------------------------------------------");
+				System.out.println("FIM DE JOGO");
+				System.out.println(player1.nome+" ganhou");
+				System.out.println("-----------------------------------------------------------");
+				break;
+			}else {
+				mesa.turno(player1, player2);
+				aux = player1;
+				player1 = player2;
+				player2 = aux;
+			}
+		}
+	}
+
+	}
+}

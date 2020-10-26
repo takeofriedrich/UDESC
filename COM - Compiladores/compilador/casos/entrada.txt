@@ -1,0 +1,16 @@
+int main(){
+
+    print "Digite o valor de a:";
+
+    int a;
+    read a;
+    print a;
+
+    print "Digite o valor de b:";
+
+    int b;
+    read b;
+    print b;
+
+    return 0;
+}
