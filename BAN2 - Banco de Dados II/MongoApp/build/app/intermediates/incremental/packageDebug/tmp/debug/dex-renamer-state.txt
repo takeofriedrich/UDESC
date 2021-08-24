@@ -1,0 +1,4 @@
+#Tue Apr 13 14:51:44 BRT 2021
+base.0=D\:\\2020.2\\BAN2 2020.2\\banFinal\\app_mobile\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

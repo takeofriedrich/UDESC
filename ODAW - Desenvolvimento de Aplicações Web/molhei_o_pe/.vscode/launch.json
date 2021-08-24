@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flutter-Web-Render",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "-d",
+                "edge",
+                "--web-renderer",
+                "html"
+            ],
+            "program": "lib/main.dart"
+        }
+    ]
+}

@@ -1,5 +1,21 @@
 Arquivos diversos das disciplinas do curso de Bacharelado em Ciência da Computação na Universidade do Estado de Santa Catarina - UDESC
 
+# 2021.1
+
+- ACT: Automação e Controle
+- IAR: Inteligência Artificial
+- IHC: Interação Homem Computador
+- MFO: Métodos Formais
+- SDI: Sistemas Distribuidos
+
+# 2020.2
+
+- BAN2: Banco de Dados 2
+- CAL: Complexidade de Algoritmos
+- CGR: Computação Gráfica
+- ODAW: Desenvolvimento Web
+- PAP: Paradigmas de Programação
+
 # 2020.1
 
 - COM: Compiladores

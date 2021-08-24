@@ -1,0 +1,1 @@
+python3 main.py 'dados15.txt' 0.1 0.1 1 10 5 1
